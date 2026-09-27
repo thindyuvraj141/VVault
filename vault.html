@@ -724,8 +724,8 @@
 <!-- ===== EmailJS (Gmail OTP login — no card, no backend needed) ===== -->
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
-  // TODO: EmailJS dashboard se ye teeno values yahan daalo (Account → General
-  // mein Public Key, Email Services mein Service ID, Email Templates mein Template ID)
+  // TODO: put these three values here from the EmailJS dashboard (Account → General
+  // for the Public Key, Email Services for the Service ID, Email Templates for the Template ID)
   const EMAILJS_PUBLIC_KEY  = "ljvp7DiFqEjV8In3j";
   const EMAILJS_SERVICE_ID  = "service_2hzuiaw";
   const EMAILJS_TEMPLATE_ID = "template_c2gomph";
@@ -752,7 +752,7 @@
           <rect x="25.5" y="27" width="13" height="10" rx="1.6" stroke="var(--accent)" stroke-width="2.2"/>
         </svg>
         <div class="brand-name">V Vault</div>
-        <div class="tagline">Apna Gmail address daalo — hum verification ke liye ek code bhejenge.</div>
+        <div class="tagline">Enter your Gmail address — we'll send a code to verify it.</div>
       </div>
 
       <div class="field">
@@ -762,7 +762,7 @@
 
       <div class="error-msg" id="gmail-error">&nbsp;</div>
       <button class="btn btn-primary" id="gmail-continue-btn" onclick="gmailContinue()">Continue</button>
-      <div class="hint" style="text-align:center;margin-top:14px;">Sirf verification ke liye — vault ka data ab bhi is device par hi rehta hai.</div>
+      <div class="hint" style="text-align:center;margin-top:14px;">For verification only — your vault data still stays on this device.</div>
     </div>
   </section>
 
@@ -776,7 +776,7 @@
     </div>
     <div class="stack" style="justify-content:flex-start;">
       <h2 style="font-size:21px;margin-bottom:8px;text-align:center;">Enter verification code</h2>
-      <div class="otp-email-display" id="otp-email-display">Code bheja gaya hai you@gmail.com par</div>
+      <div class="otp-email-display" id="otp-email-display">Code sent to you@gmail.com</div>
 
       <div class="otp-boxes" id="otp-boxes">
         <input class="otp-box" maxlength="1" inputmode="numeric" data-i="0">
@@ -790,7 +790,7 @@
       <div class="error-msg" id="otp-error" style="text-align:center;">&nbsp;</div>
       <button class="btn btn-primary" onclick="verifyOtpCode()">Verify</button>
       <div class="otp-resend">
-        Code nahi aaya? <button id="otp-resend-btn" onclick="resendOtp()">Resend</button>
+        Didn't get the code? <button id="otp-resend-btn" onclick="resendOtp()">Resend</button>
       </div>
     </div>
   </section>
@@ -1612,17 +1612,17 @@
           </div>
           <div style="font-size:14px;font-weight:500;margin-bottom:6px;">Sign in with Google</div>
           <div style="font-size:12.5px;color:var(--text-muted);line-height:1.6;margin-bottom:16px;">
-            Apna vault automatically aapke Google Drive mein backup hoga — bilkul WhatsApp ki tarah. Sirf aap apna data dekh sakte ho.
+            Your vault backs up automatically to your Google Drive — just like WhatsApp. Only you can see your data.
           </div>
           <button onclick="gdriveSignIn()" id="gdrive-signin-btn" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:12px;background:var(--card);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-size:14px;font-weight:500;color:var(--text);">
             <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.4 1.2 8.7 3.2l6.5-6.5C35.2 2.7 30 .5 24 .5 14.7.5 6.7 6 2.9 13.9l7.6 5.9C12.4 13.8 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.3-4 6.1-9.9 6.1-17z"/><path fill="#FBBC05" d="M10.5 28.5A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.1.7-4.5L2.6 13.6A23.5 23.5 0 0 0 .5 24c0 3.8.9 7.3 2.4 10.5z"/><path fill="#34A853" d="M24 47.5c6 0 11-2 14.7-5.5l-7.5-5.8c-2 1.4-4.5 2.3-7.2 2.3-6.3 0-11.6-4.3-13.5-10.1l-7.6 5.9C6.8 42 14.8 47.5 24 47.5z"/></svg>
-            Google se sign in karo
+            Sign in with Google
           </button>
         </div>
 
         <div style="padding:12px;background:var(--bg-elevated);border-radius:10px;margin-top:4px;">
           <div style="font-size:11.5px;color:var(--text-muted);line-height:1.6;">
-            🔒 Tumhara vault encrypted rahta hai. Google sirf ek encrypted file dekhta hai — andar kya hai ye sirf tumhe pata hai.
+            🔒 Your vault stays encrypted. Google only sees an encrypted file — only you know what's inside.
           </div>
         </div>
       </div>
@@ -1645,7 +1645,7 @@
         <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
           <div>
             <div style="font-size:14px;font-weight:500;">Back up automatically</div>
-            <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Google Drive mein save karo</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Save to Google Drive</div>
           </div>
           <div class="toggle-switch" id="auto-backup-toggle" onclick="toggleAutoBackup()"><div class="toggle-knob"></div></div>
         </div>
@@ -1913,7 +1913,7 @@ async function gmailContinue(){
   try{
     await generateAndSendOtp(email);
     pendingGmailEmail = email;
-    document.getElementById('otp-email-display').textContent = 'Code bheja gaya hai ' + email + ' par';
+    document.getElementById('otp-email-display').textContent = 'Code sent to ' + email;
     document.querySelectorAll('.otp-box').forEach(b => b.value = '');
     clearError('otp');
     goTo('screen-otp');
@@ -1921,7 +1921,7 @@ async function gmailContinue(){
     startOtpCooldown();
   }catch(err){
     console.error('sendOtp error', err);
-    setError('gmail','Code bhej nahi paye — internet check karo ya thodi der baad try karo.');
+    setError('gmail','Could not send code — check your internet and try again in a moment.');
   }finally{
     btn.disabled = false; btn.textContent = 'Continue';
   }
@@ -1949,11 +1949,11 @@ async function resendOtp(){
   rbtn.disabled = true;
   try{
     await generateAndSendOtp(pendingGmailEmail);
-    showToast('Naya code bhej diya');
+    showToast('New code sent');
     startOtpCooldown();
   }catch(err){
     console.error('resendOtp error', err);
-    setError('otp','Resend fail hua, try again.');
+    setError('otp','Resend failed, try again.');
     rbtn.disabled = false;
   }
 }
@@ -1962,15 +1962,15 @@ function verifyOtpCode(){
   const boxes = Array.from(document.querySelectorAll('.otp-box'));
   const code = boxes.map(b => b.value).join('');
   if(code.length !== 6){
-    setError('otp','6-digit code puri daalo.');
+    setError('otp','Please enter the full 6-digit code.');
     return;
   }
   if(Date.now() > pendingOtpExpiresAt){
-    setError('otp','Code expire ho gaya. Resend dabao.');
+    setError('otp','Code expired. Tap Resend.');
     return;
   }
   if(code !== pendingOtpCode){
-    setError('otp','Code galat hai. Dobara try karo.');
+    setError('otp','Incorrect code. Try again.');
     boxes.forEach(b => b.value = '');
     boxes[0].focus();
     return;
@@ -4767,17 +4767,17 @@ checkForSharedMedia();
 
 <!-- ===== GOOGLE DRIVE BACKUP SYSTEM ===== -->
 <!-- 
-  SETUP (ek baar karna hai):
-  1. https://console.cloud.google.com pe jao
-  2. New Project banao → "V Vault"
+  SETUP (one-time):
+  1. Go to https://console.cloud.google.com
+  2. Create a new project → "V Vault"
   3. APIs & Services → Enable: "Google Drive API" + "Google Identity Services"
   4. Credentials → Create OAuth 2.0 Client ID (Web application)
-  5. Authorized JavaScript origins mein apni website ka URL daalo
-  6. Neeche CLIENT_ID mein apna ID daalo
+  5. Add your website's URL under Authorized JavaScript origins
+  6. Put your ID in CLIENT_ID below
 -->
 <script>
 (function(){
-  /* ── CONFIG: yahan apna Google OAuth Client ID daalo ── */
+  /* ── CONFIG: put your Google OAuth Client ID here ── */
   const GDRIVE_CLIENT_ID = '1067709214439-rcvj3gbbrv65j1t8gcn87dii8dcqa4fk.apps.googleusercontent.com';
   const GDRIVE_SCOPES    = 'https://www.googleapis.com/auth/drive.file email profile';
   const FOLDER_NAME      = 'V Vault Backups';
@@ -4831,9 +4831,9 @@ checkForSharedMedia();
           await fetchGdriveUserInfo();
           saveGdriveSession(expiresIn);
           showGdriveSignedIn();
-          showToast('✓ Google Drive se connected!');
+          showToast('✓ Connected to Google Drive!');
         } else {
-          showToast('Sign in cancel hua');
+          showToast('Sign in cancelled');
         }
       });
 
@@ -4844,7 +4844,7 @@ checkForSharedMedia();
 
     /* ---- Normal website: popup flow (unchanged) ---- */
     if(typeof google === 'undefined'){
-      showToast('Google se connect ho raha hai, thoda wait karo…');
+      showToast('Connecting to Google, please wait…');
       setTimeout(window.gdriveSignIn, 1500);
       return;
     }
@@ -4852,12 +4852,12 @@ checkForSharedMedia();
       client_id: GDRIVE_CLIENT_ID,
       scope: GDRIVE_SCOPES,
       callback: async (resp) => {
-        if(resp.error){ showToast('Sign in cancel hua'); return; }
+        if(resp.error){ showToast('Sign in cancelled'); return; }
         gdriveToken = resp.access_token;
         await fetchGdriveUserInfo();
         saveGdriveSession(resp.expires_in);
         showGdriveSignedIn();
-        showToast('✓ Google Drive se connected!');
+        showToast('✓ Connected to Google Drive!');
       }
     });
     client.requestAccessToken();
@@ -4874,18 +4874,18 @@ checkForSharedMedia();
     saveAutoBackupSettings();
     localStorage.removeItem('vvault_gdrive');
     showGdriveSignedOut();
-    showToast('Google Drive se disconnect ho gaya');
+    showToast('Disconnected from Google Drive');
   };
 
   window.gdriveBackupNow = async function(){
-    if(!gdriveToken){ showToast('Pehle Google se sign in karo'); return; }
+    if(!gdriveToken){ showToast('Please sign in with Google first'); return; }
     const btn = document.getElementById('gdrive-backup-now-btn');
     if(btn){ btn.disabled = true; btn.textContent = 'Backing up…'; }
     openBackupPwModalForGdrive();
   };
 
   window.gdriveRestorePrompt = async function(){
-    if(!gdriveToken){ showToast('Pehle Google se sign in karo'); return; }
+    if(!gdriveToken){ showToast('Please sign in with Google first'); return; }
     document.getElementById('gdrive-restore-overlay').classList.add('active');
     await loadGdriveBackupList();
   };
@@ -4897,7 +4897,7 @@ checkForSharedMedia();
   /* Called by backup-pw modal after password confirmed — mode 'gdrive-create' */
   window.performGdriveBackup = async function(password){
     try{
-      showToast('Google Drive mein save ho raha hai…');
+      showToast('Saving to Google Drive…');
       const saltBytes = crypto.getRandomValues(new Uint8Array(16));
       const ivBytes   = crypto.getRandomValues(new Uint8Array(12));
       const key       = await deriveKey(password, saltBytes);
@@ -4923,13 +4923,13 @@ checkForSharedMedia();
       refreshAutoBackupUI();
       const banner = document.getElementById('backup-reminder-banner');
       if(banner) banner.style.display = 'none';
-      showToast('✓ Backup Google Drive mein save ho gaya!');
+      showToast('✓ Backup saved to Google Drive!');
     }catch(err){
       console.error('GDrive backup error', err);
       if(err.message === 'GDRIVE_AUTH_EXPIRED'){
-        showToast('Session khatam ho gaya — dobara Google se sign in karo');
+        showToast('Session expired — please sign in with Google again');
       } else {
-        showToast('Backup fail hua — try again');
+        showToast('Backup failed — try again');
       }
     }finally{
       const btn = document.getElementById('gdrive-backup-now-btn');
@@ -4943,7 +4943,7 @@ checkForSharedMedia();
     pendingGdriveRestoreId = fileId;
     backupPwMode = 'gdrive-restore';
     document.getElementById('backup-pw-title').textContent   = 'Enter backup password';
-    document.getElementById('backup-pw-desc').textContent    = 'Wahi password daalo jo backup banate waqt tha.';
+    document.getElementById('backup-pw-desc').textContent    = 'Enter the same password used when the backup was created.';
     document.getElementById('backup-pw-input').value         = '';
     clearError('backuppw');
     document.getElementById('backup-pw-confirm-btn').textContent = 'Restore';
@@ -4952,7 +4952,7 @@ checkForSharedMedia();
 
   window.performGdriveRestore = async function(password){
     try{
-      showToast('Google Drive se data la raha hai…');
+      showToast('Fetching data from Google Drive…');
       const resp = await gdriveApiFetch(
         'https://www.googleapis.com/drive/v3/files/' + pendingGdriveRestoreId + '?alt=media',
         {headers:{Authorization:'Bearer '+gdriveToken}}
@@ -4967,7 +4967,7 @@ checkForSharedMedia();
       const cipherBuf    = base64ToBuf(parsed.ciphertext);
       let decBuf;
       try{ decBuf = await crypto.subtle.decrypt({name:'AES-GCM',iv:ivBytes}, key, cipherBuf); }
-      catch(e){ setError('backuppw','Wrong password ya file damage hai.'); return false; }
+      catch(e){ setError('backuppw','Wrong password or the file is corrupted.'); return false; }
       const data = JSON.parse(new TextDecoder().decode(decBuf));
       const albumIdMap = {};
       (data.albums||[]).forEach(a=>{
@@ -4994,14 +4994,14 @@ checkForSharedMedia();
       await persistLibrary();
       renderFolders();
       if(currentFolderId) renderFolderPhotos();
-      showToast('✓ '+count+' items Google Drive se restore ho gaye!');
+      showToast('✓ '+count+' items restored from Google Drive!');
       return true;
     }catch(err){
       console.error('GDrive restore error', err);
       if(err.message === 'GDRIVE_AUTH_EXPIRED'){
-        showToast('Session khatam ho gaya — dobara Google se sign in karo');
+        showToast('Session expired — please sign in with Google again');
       } else {
-        showToast('Restore fail hua');
+        showToast('Restore failed');
       }
       return false;
     }
@@ -5129,7 +5129,7 @@ checkForSharedMedia();
       const j = await r.json();
       const files = j.files || [];
       if(files.length === 0){
-        listEl.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;">Koi backup nahi mila<br><span style="font-size:11.5px;">Pehle ek backup banao</span></div>';
+        listEl.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;">No backups found<br><span style="font-size:11.5px;">Create a backup first</span></div>';
         return;
       }
       listEl.innerHTML = files.map(f=>{
@@ -5146,7 +5146,7 @@ checkForSharedMedia();
           +'</div>';
       }).join('');
     }catch(err){
-      listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--danger);font-size:13px;">Load nahi hua — try again</div>';
+      listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--danger);font-size:13px;">Failed to load — try again</div>';
     }
   }
 
@@ -5157,7 +5157,7 @@ checkForSharedMedia();
     backupPwMode = 'gdrive-create';
     const isPin = vault.secretType === 'pin';
     document.getElementById('backup-pw-title').textContent = isPin ? 'Confirm your PIN' : 'Confirm your password';
-    document.getElementById('backup-pw-desc').textContent  = 'Google Drive backup ko encrypt karne ke liye tumhara password chahiye.';
+    document.getElementById('backup-pw-desc').textContent  = 'Your password is needed to encrypt the Google Drive backup.';
     document.getElementById('backup-pw-input').value       = '';
     clearError('backuppw');
     document.getElementById('backup-pw-confirm-btn').textContent = 'Back up to Drive';
@@ -5169,13 +5169,13 @@ checkForSharedMedia();
   window.confirmBackupPassword = async function(){
     if(backupPwMode === 'gdrive-create'){
       const pw = document.getElementById('backup-pw-input').value;
-      if(!pw){ setError('backuppw','Password daalo.'); return; }
+      if(!pw){ setError('backuppw','Enter your password.'); return; }
       const btn = document.getElementById('backup-pw-confirm-btn');
       btn.disabled = true; btn.textContent = 'Please wait…';
       const saltCheck = base64ToBuf(vault.passwordSalt);
       const checkHash = await hashSecret(pw, saltCheck);
       if(checkHash !== vault.passwordHash){
-        setError('backuppw','Password galat hai.');
+        setError('backuppw','Incorrect password.');
         btn.disabled = false; btn.textContent = 'Back up to Drive';
         return;
       }
@@ -5183,7 +5183,7 @@ checkForSharedMedia();
       await performGdriveBackup(pw);
     } else if(backupPwMode === 'gdrive-restore'){
       const pw = document.getElementById('backup-pw-input').value;
-      if(!pw){ setError('backuppw','Password daalo.'); return; }
+      if(!pw){ setError('backuppw','Enter your password.'); return; }
       const btn = document.getElementById('backup-pw-confirm-btn');
       btn.disabled = true; btn.textContent = 'Restoring…';
       const ok = await performGdriveRestore(pw);
