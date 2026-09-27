@@ -249,7 +249,7 @@
     background:var(--header-bg);border-bottom:none;
     box-shadow:0 2px 8px rgba(0,0,0,.2);
   }
-  #screen-vault .vault-header{justify-content:space-between;}
+  #screen-vault .vault-header{justify-content:flex-start;}
   .header-logo{
     width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,0.16);
     display:flex;align-items:center;justify-content:center;flex-shrink:0;
@@ -258,8 +258,7 @@
   .header-icon-group{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:2px 3px;}
   .header-icon-label{font-size:9.5px;color:var(--wa-header-text);opacity:.9;font-family:'Inter',sans-serif;font-weight:500;white-space:nowrap;}
   #screen-vault .vault-title-block{
-    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-    text-align:center;pointer-events:none;
+    text-align:left;margin-left:10px;
   }
   .vault-header .icon-btn{ width:40px; height:40px; }
   .vault-title-block .brand-name{font-size:23px;color:var(--wa-header-text);font-family:'Poppins',sans-serif;font-weight:700;letter-spacing:0.2px;}
@@ -285,6 +284,32 @@
     box-shadow:0 3px 10px rgba(0,0,0,0.25);
   }
   .gdrive-header-btn:active{transform:scale(0.95);}
+
+  .trash-header-btn{
+    background:rgba(255,255,255,0.94);
+    box-shadow:0 2px 6px rgba(0,0,0,0.18);
+    transition:transform .15s ease, box-shadow .15s ease;
+    font-size:17px;
+  }
+  .trash-header-btn:hover{
+    background:#ffffff;
+    transform:scale(1.07);
+    box-shadow:0 3px 10px rgba(0,0,0,0.25);
+  }
+  .trash-header-btn:active{transform:scale(0.95);}
+
+  .menu-header-btn{
+    background:rgba(255,255,255,0.94);
+    box-shadow:0 2px 6px rgba(0,0,0,0.18);
+    transition:transform .15s ease, box-shadow .15s ease;
+    color:#3a4a52;
+  }
+  .menu-header-btn:hover{
+    background:#ffffff;
+    transform:scale(1.07);
+    box-shadow:0 3px 10px rgba(0,0,0,0.25);
+  }
+  .menu-header-btn:active{transform:scale(0.95);}
 
   /* header quick appearance buttons */
   .header-actions{position:relative;}
@@ -313,7 +338,7 @@
     box-sizing:content-box;
   }
   .pop-item{font-family:'Poppins',sans-serif;font-weight:500;}
-  #screen-vault .header-actions{gap:6px;flex-shrink:0;}
+  #screen-vault .header-actions{gap:6px;flex-shrink:0;margin-left:auto;}
   #screen-vault .header-actions .icon-btn{width:34px;height:34px;}
   #screen-vault .vault-title-block{min-width:0;}
 
@@ -1025,10 +1050,8 @@
       </div>
       <div class="header-actions">
         <div class="header-icon-group" onclick="openFolder('__trash__');" title="Trash" id="header-trash-btn">
-          <div class="icon-btn">
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3.5 5h11M7 5V3.5h4V5M4.5 5l.6 9.2c.05.7.65 1.3 1.35 1.3h5.1c.7 0 1.3-.6 1.35-1.3L13.5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
-          <span class="header-icon-label">🗑️ Trash</span>
+          <div class="icon-btn trash-header-btn">🗑️</div>
+          <span class="header-icon-label">Trash</span>
         </div>
         <div class="header-icon-group" onclick="openAutoBackupModal();" title="Google Drive Backup" id="header-gdrive-btn">
           <div class="icon-btn gdrive-header-btn">
@@ -1046,7 +1069,7 @@
           <span class="header-icon-label">Backup</span>
         </div>
         <div class="header-icon-group" id="more-menu-btn" onclick="toggleHeaderPopover('more-popover', event)" title="Menu">
-          <div class="icon-btn">
+          <div class="icon-btn menu-header-btn">
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="3.5" r="1.6" fill="currentColor"/><circle cx="9" cy="9" r="1.6" fill="currentColor"/><circle cx="9" cy="14.5" r="1.6" fill="currentColor"/></svg>
           </div>
           <span class="header-icon-label">Menu</span>
@@ -1416,33 +1439,24 @@
   <div class="sheet-overlay" id="sheet-overlay" onclick="closeSettings()"></div>
   <div class="sheet" id="settings-sheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-item" style="cursor:default;">
+    <div class="sheet-item" onclick="closeSettings(); openLockScreenSettings();">
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="4" y="8" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 8V5.5a2.5 2.5 0 0 1 5 0V8" stroke="currentColor" stroke-width="1.4"/></svg>
-      <span style="flex:1;">Auto-lock</span>
-      <select id="autolock-select" onchange="setAutoLock(this.value)" style="width:auto;padding:6px 26px 6px 10px;font-size:13px;border-radius:8px;background-position:right 8px center;">
-        <option value="0">Off</option>
-        <option value="1">1 minute</option>
-        <option value="5">5 minutes</option>
-        <option value="15">15 minutes</option>
-      </select>
+      Lock Screen
     </div>
-    <div class="sheet-item" onclick="lockVaultNow()">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="4" y="8" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 8V5.5a2.5 2.5 0 0 1 5 0V8" stroke="currentColor" stroke-width="1.4"/></svg>
-      Lock vault now
-    </div>
-    <div class="sheet-item" onclick="closeSettings(); goToChangePassword();">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.4"/><path d="M9 5.5V9L11.5 10.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-      <span id="change-secret-label">Change password</span>
+    <!-- WhatsApp-style Auto Backup row -->
+    <div class="sheet-item" onclick="closeSettings(); openAutoBackupModal();">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2V10M9 10L5.5 6.5M9 10L12.5 6.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 13V15.5H15V13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="14.5" cy="4.5" r="3" fill="var(--accent)"/><path d="M13.2 4.5l.9.9 1.4-1.4" stroke="white" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span style="flex:1;">Auto backup</span>
+      <span id="auto-backup-status-label" style="font-size:12px;color:var(--text-muted);">Off</span>
     </div>
     <div class="sheet-item" onclick="toggleBiometric()">
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2.5C5.4 2.5 2.5 5.4 2.5 9v2.5M9 2.5c3.6 0 6.5 2.9 6.5 6.5v2.5M6 15.2V9a3 3 0 0 1 6 0v3.5a1.5 1.5 0 0 1-3 0V9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
       <span style="flex:1;">Face / Touch unlock</span>
       <div class="toggle-switch" id="biometric-toggle"><div class="toggle-knob"></div></div>
     </div>
-    <div class="sheet-item" onclick="togglePrivacyMode()">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M1.5 9C3 5.5 6 3.5 9 3.5s6 2 7.5 5.5c-1.5 3.5-4.5 5.5-7.5 5.5S3 12.5 1.5 9Z" stroke="currentColor" stroke-width="1.3"/><circle cx="9" cy="9" r="2.3" stroke="currentColor" stroke-width="1.3"/></svg>
-      <span style="flex:1;">Hide content when I switch apps</span>
-      <div class="toggle-switch" id="privacy-toggle"><div class="toggle-knob"></div></div>
+    <div class="sheet-item" onclick="closeSettings(); openAdvanceSettings();">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2.2C5.2 2.2 2.2 5 2.2 8.7c0 3.6 2.8 6.4 6.4 6.4 1.2 0 1.7-.7 1.7-1.4 0-.9-.7-1.2-.7-2 0-.8.6-1.3 1.4-1.3h1.6c1.6 0 2.8-1.1 2.8-2.7C15.4 4.6 12.6 2.2 9 2.2Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+      Advance Setting
     </div>
     <div class="sheet-item" onclick="closeSettings(); openFacedownLock();">
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="5" width="12" height="9" rx="2" stroke="currentColor" stroke-width="1.4"/><circle cx="9" cy="9.5" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 5L7.3 3.5H10.7L11.5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
@@ -1453,29 +1467,18 @@
       <span style="flex:1;">Decoy vault</span>
       <span style="font-size:12px;color:var(--text-muted);" id="decoy-status-label">Off</span>
     </div>
-    <div class="sheet-item" onclick="closeSettings(); manualCheckForUpdate();">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 9a7 7 0 1 1 2 4.9M2 9V5M2 9H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Check for app update
-    </div>
     <div class="sheet-item" onclick="openStorageStats()">
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 15V9M9 15V3M15 15V6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
       Storage &amp; stats
-    </div>
-    <div class="sheet-item" onclick="toggleAppBadge()">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="3" width="12" height="12" rx="3" stroke="currentColor" stroke-width="1.4"/><circle cx="13" cy="5" r="2.5" fill="currentColor"/></svg>
-      <span style="flex:1;">Show item count on app icon</span>
-      <div class="toggle-switch" id="badge-toggle"><div class="toggle-knob"></div></div>
     </div>
     <div class="sheet-item" id="gallery-delete-item" style="display:none;" onclick="toggleGalleryDelete()">
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4 5H14M7 5V3.5H11V5M6 5V15H12V5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span style="flex:1;">Remove originals from gallery</span>
       <div class="toggle-switch" id="gallery-delete-toggle"><div class="toggle-knob"></div></div>
     </div>
-    <!-- WhatsApp-style Auto Backup row -->
-    <div class="sheet-item" onclick="closeSettings(); openAutoBackupModal();">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2V10M9 10L5.5 6.5M9 10L12.5 6.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 13V15.5H15V13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="14.5" cy="4.5" r="3" fill="var(--accent)"/><path d="M13.2 4.5l.9.9 1.4-1.4" stroke="white" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span style="flex:1;">Auto backup</span>
-      <span id="auto-backup-status-label" style="font-size:12px;color:var(--text-muted);">Off</span>
+    <div class="sheet-item" onclick="closeSettings(); manualCheckForUpdate();">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 9a7 7 0 1 1 2 4.9M2 9V5M2 9H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Check for app update
     </div>
     <div class="sheet-item danger" onclick="closeSettings(); confirmWipe();">
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4 5H14M7 5V3.5H11V5M6 5V15H12V5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1491,6 +1494,54 @@
       <div class="manage-list" id="stats-body"></div>
       <div class="modal-actions">
         <button class="btn btn-ghost" onclick="closeStorageStats()">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lock Screen: Auto-lock + Lock vault now + Change PIN/password -->
+  <div class="modal-overlay" id="lock-screen-overlay">
+    <div class="modal-card" style="text-align:left;">
+      <h3>Lock Screen</h3>
+      <div class="sheet-item" style="cursor:default;padding:12px 0;border-bottom:1px solid var(--border);">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="4" y="8" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 8V5.5a2.5 2.5 0 0 1 5 0V8" stroke="currentColor" stroke-width="1.4"/></svg>
+        <span style="flex:1;">Auto-lock</span>
+        <select id="autolock-select" onchange="setAutoLock(this.value)" style="width:auto;padding:6px 26px 6px 10px;font-size:13px;border-radius:8px;background-position:right 8px center;">
+          <option value="0">Off</option>
+          <option value="1">1 minute</option>
+          <option value="5">5 minutes</option>
+          <option value="15">15 minutes</option>
+        </select>
+      </div>
+      <div class="sheet-item" onclick="closeLockScreenSettings(); lockVaultNow();" style="padding:12px 0;border-bottom:1px solid var(--border);">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="4" y="8" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 8V5.5a2.5 2.5 0 0 1 5 0V8" stroke="currentColor" stroke-width="1.4"/></svg>
+        Lock vault now
+      </div>
+      <div class="sheet-item" onclick="closeLockScreenSettings(); goToChangePassword();" style="padding:12px 0;">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.4"/><path d="M9 5.5V9L11.5 10.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <span id="change-secret-label">Change password</span>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeLockScreenSettings()" style="width:100%;">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Advance Setting: Hide content + Show item count -->
+  <div class="modal-overlay" id="advance-setting-overlay">
+    <div class="modal-card" style="text-align:left;">
+      <h3>Advance Setting</h3>
+      <div class="sheet-item" onclick="togglePrivacyMode()" style="padding:12px 0;border-bottom:1px solid var(--border);">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M1.5 9C3 5.5 6 3.5 9 3.5s6 2 7.5 5.5c-1.5 3.5-4.5 5.5-7.5 5.5S3 12.5 1.5 9Z" stroke="currentColor" stroke-width="1.3"/><circle cx="9" cy="9" r="2.3" stroke="currentColor" stroke-width="1.3"/></svg>
+        <span style="flex:1;">Hide content when I switch apps</span>
+        <div class="toggle-switch" id="privacy-toggle"><div class="toggle-knob"></div></div>
+      </div>
+      <div class="sheet-item" onclick="toggleAppBadge()" style="padding:12px 0;">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="3" width="12" height="12" rx="3" stroke="currentColor" stroke-width="1.4"/><circle cx="13" cy="5" r="2.5" fill="currentColor"/></svg>
+        <span style="flex:1;">Show item count on app icon</span>
+        <div class="toggle-switch" id="badge-toggle"><div class="toggle-knob"></div></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeAdvanceSettings()" style="width:100%;">Close</button>
       </div>
     </div>
   </div>
@@ -2560,6 +2611,20 @@ async function toggleIntruderSelfie(){
   const t = document.getElementById('intruder-selfie-toggle');
   if(t) t.classList.toggle('on', intruderSelfieEnabled);
   showToast(intruderSelfieEnabled ? '✓ Intruder Selfie enabled' : 'Intruder Selfie off');
+}
+
+function openLockScreenSettings(){
+  document.getElementById('change-secret-label').textContent = vault.secretType === 'pin' ? 'Change PIN' : 'Change password';
+  document.getElementById('lock-screen-overlay').classList.add('active');
+}
+function closeLockScreenSettings(){
+  document.getElementById('lock-screen-overlay').classList.remove('active');
+}
+function openAdvanceSettings(){
+  document.getElementById('advance-setting-overlay').classList.add('active');
+}
+function closeAdvanceSettings(){
+  document.getElementById('advance-setting-overlay').classList.remove('active');
 }
 
 function openFacedownLock(){
