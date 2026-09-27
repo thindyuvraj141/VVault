@@ -1020,11 +1020,16 @@
   <section class="screen" id="screen-vault">
     <div class="vault-header">
       <div class="header-logo" aria-hidden="true">V</div>
-      <div class="icon-btn" onclick="openFolder('__trash__');" title="Trash" id="header-trash-btn" style="font-size:18px;">🗑️</div>
       <div class="vault-title-block">
         <div class="brand-name">V Vault</div>
       </div>
       <div class="header-actions">
+        <div class="header-icon-group" onclick="openFolder('__trash__');" title="Trash" id="header-trash-btn">
+          <div class="icon-btn">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3.5 5h11M7 5V3.5h4V5M4.5 5l.6 9.2c.05.7.65 1.3 1.35 1.3h5.1c.7 0 1.3-.6 1.35-1.3L13.5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span class="header-icon-label">🗑️ Trash</span>
+        </div>
         <div class="header-icon-group" onclick="openAutoBackupModal();" title="Google Drive Backup" id="header-gdrive-btn">
           <div class="icon-btn gdrive-header-btn">
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -1055,17 +1060,6 @@
             <svg class="ico-moon" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2.5a6.5 6.5 0 1 0 6.4 7.6A6.5 6.5 0 0 1 9 2.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
             <svg class="ico-sun" width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="3.2" stroke="currentColor" stroke-width="1.5"/><path d="M9 1.8v2M9 14.2v2M1.8 9h2M14.2 9h2M3.9 3.9l1.4 1.4M12.7 12.7l1.4 1.4M14.1 3.9l-1.4 1.4M5.3 12.7l-1.4 1.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
             <span class="dark-toggle-label">Dark mode</span>
-          </div>
-          <div class="pop-item accent-row" style="cursor:default;">
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2.2C5.2 2.2 2.2 5 2.2 8.7c0 3.6 2.8 6.4 6.4 6.4 1.2 0 1.7-.7 1.7-1.4 0-.9-.7-1.2-.7-2 0-.8.6-1.3 1.4-1.3h1.6c1.6 0 2.8-1.1 2.8-2.7C15.4 4.6 12.6 2.2 9 2.2Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="5.6" cy="8" r="1" fill="currentColor"/><circle cx="8" cy="5.4" r="1" fill="currentColor"/><circle cx="11.2" cy="5.8" r="1" fill="currentColor"/></svg>
-            <span style="flex:1;">App colour</span>
-            <div class="accent-swatches" id="accent-swatches">
-              <button type="button" class="accent-swatch" data-accent="gold" style="background:#C6A15B" onclick="setAccent('gold')" title="Gold"></button>
-              <button type="button" class="accent-swatch" data-accent="blue" style="background:#4A90D9" onclick="setAccent('blue')" title="Blue"></button>
-              <button type="button" class="accent-swatch" data-accent="green" style="background:#25D366" onclick="setAccent('green')" title="Green"></button>
-              <button type="button" class="accent-swatch" data-accent="rose" style="background:#D46E6E" onclick="setAccent('rose')" title="Rose"></button>
-              <button type="button" class="accent-swatch" data-accent="purple" style="background:#967AD6" onclick="setAccent('purple')" title="Purple"></button>
-            </div>
           </div>
           <div class="pop-item" onclick="closeHeaderPopovers(); openSettings();">
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1450,14 +1444,9 @@
       <span style="flex:1;">Hide content when I switch apps</span>
       <div class="toggle-switch" id="privacy-toggle"><div class="toggle-knob"></div></div>
     </div>
-    <div class="sheet-item" onclick="toggleIntruderSelfie()">
+    <div class="sheet-item" onclick="closeSettings(); openFacedownLock();">
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="5" width="12" height="9" rx="2" stroke="currentColor" stroke-width="1.4"/><circle cx="9" cy="9.5" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 5L7.3 3.5H10.7L11.5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-      <span style="flex:1;">Intruder Selfie</span>
-      <div class="toggle-switch" id="intruder-selfie-toggle"><div class="toggle-knob"></div></div>
-    </div>
-    <div class="sheet-item" onclick="closeSettings(); openIntruderLog();">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 15V9M9 15V3M15 15V6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-      Failed attempts log
+      Facedown Lock
     </div>
     <div class="sheet-item" onclick="closeSettings(); openDecoySetup();">
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2 3.5 4.2v4.1c0 3.4 2.3 6.4 5.5 7.5 3.2-1.1 5.5-4.1 5.5-7.5V4.2L9 2Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M9 9a1.6 1.6 0 1 0 0-3.2A1.6 1.6 0 0 0 9 9Zm0 0v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
@@ -1502,6 +1491,26 @@
       <div class="manage-list" id="stats-body"></div>
       <div class="modal-actions">
         <button class="btn btn-ghost" onclick="closeStorageStats()">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Facedown Lock: Intruder Selfie + Failed attempts log -->
+  <div class="modal-overlay" id="facedown-lock-overlay">
+    <div class="modal-card" style="text-align:left;">
+      <h3>Facedown Lock</h3>
+      <p style="font-size:13px;color:var(--text-muted);line-height:1.5;margin:0 0 10px;">Catches wrong unlock attempts with a quiet front-camera photo.</p>
+      <div class="sheet-item" onclick="toggleIntruderSelfie()" style="padding:12px 0;border-bottom:1px solid var(--border);">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="5" width="12" height="9" rx="2" stroke="currentColor" stroke-width="1.4"/><circle cx="9" cy="9.5" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 5L7.3 3.5H10.7L11.5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <span style="flex:1;">Intruder Selfie</span>
+        <div class="toggle-switch" id="intruder-selfie-toggle"><div class="toggle-knob"></div></div>
+      </div>
+      <div class="sheet-item" onclick="closeFacedownLock(); openIntruderLog();" style="padding:12px 0;">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 15V9M9 15V3M15 15V6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Failed attempts log
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeFacedownLock()" style="width:100%;">Close</button>
       </div>
     </div>
   </div>
@@ -2551,6 +2560,15 @@ async function toggleIntruderSelfie(){
   const t = document.getElementById('intruder-selfie-toggle');
   if(t) t.classList.toggle('on', intruderSelfieEnabled);
   showToast(intruderSelfieEnabled ? '✓ Intruder Selfie enabled' : 'Intruder Selfie off');
+}
+
+function openFacedownLock(){
+  const t = document.getElementById('intruder-selfie-toggle');
+  if(t) t.classList.toggle('on', intruderSelfieEnabled);
+  document.getElementById('facedown-lock-overlay').classList.add('active');
+}
+function closeFacedownLock(){
+  document.getElementById('facedown-lock-overlay').classList.remove('active');
 }
 
 function openDecoySetup(){
@@ -4707,7 +4725,7 @@ async function loadAppSettings(){
     const saved = await dbGet('appSettings');
     if(saved){
       appTheme = saved.theme || 'light';
-      appAccent = saved.accent || 'green';
+      appAccent = 'green'; // colour picker removed — green is the only accent now
       autoLockMinutes = saved.autoLockMinutes || 0;
       gridColumns = saved.gridColumns || 3;
       showAppBadge = saved.showAppBadge !== false;
