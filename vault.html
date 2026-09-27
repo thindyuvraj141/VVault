@@ -1024,6 +1024,12 @@
         <div class="brand-name">V Vault</div>
       </div>
       <div class="header-actions">
+        <div class="header-icon-group" onclick="openFolder('__trash__');" title="Trash" id="header-trash-btn">
+          <div class="icon-btn">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3.5 5h11M7 5V3.5h4V5M4.5 5l.6 9.2c.05.7.65 1.3 1.35 1.3h5.1c.7 0 1.3-.6 1.35-1.3L13.5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span class="header-icon-label">🗑️ Trash</span>
+        </div>
         <div class="header-icon-group" onclick="openAutoBackupModal();" title="Google Drive Backup" id="header-gdrive-btn">
           <div class="icon-btn gdrive-header-btn">
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -1449,6 +1455,20 @@
       <span style="flex:1;">Hide content when I switch apps</span>
       <div class="toggle-switch" id="privacy-toggle"><div class="toggle-knob"></div></div>
     </div>
+    <div class="sheet-item" onclick="toggleIntruderSelfie()">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="5" width="12" height="9" rx="2" stroke="currentColor" stroke-width="1.4"/><circle cx="9" cy="9.5" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 5L7.3 3.5H10.7L11.5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <span style="flex:1;">Intruder Selfie</span>
+      <div class="toggle-switch" id="intruder-selfie-toggle"><div class="toggle-knob"></div></div>
+    </div>
+    <div class="sheet-item" onclick="closeSettings(); openIntruderLog();">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 15V9M9 15V3M15 15V6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      Failed attempts log
+    </div>
+    <div class="sheet-item" onclick="closeSettings(); openDecoySetup();">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2 3.5 4.2v4.1c0 3.4 2.3 6.4 5.5 7.5 3.2-1.1 5.5-4.1 5.5-7.5V4.2L9 2Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M9 9a1.6 1.6 0 1 0 0-3.2A1.6 1.6 0 0 0 9 9Zm0 0v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <span style="flex:1;">Decoy vault</span>
+      <span style="font-size:12px;color:var(--text-muted);" id="decoy-status-label">Off</span>
+    </div>
     <div class="sheet-item" onclick="closeSettings(); manualCheckForUpdate();">
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 9a7 7 0 1 1 2 4.9M2 9V5M2 9H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
       Check for app update
@@ -1487,6 +1507,34 @@
       <div class="manage-list" id="stats-body"></div>
       <div class="modal-actions">
         <button class="btn btn-ghost" onclick="closeStorageStats()">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Decoy vault setup modal -->
+  <div class="modal-overlay" id="decoy-overlay">
+    <div class="modal-card">
+      <h3>Decoy vault</h3>
+      <p id="decoy-status-hint" style="font-size:13px;color:var(--text-muted);line-height:1.5;margin:0 0 14px;">Set a separate password that opens an empty, harmless-looking vault.</p>
+      <input type="password" id="decoy-pw" placeholder="Decoy password" autocomplete="new-password">
+      <input type="password" id="decoy-pw2" placeholder="Confirm decoy password" autocomplete="new-password" style="margin-top:8px;">
+      <div class="error-msg" id="decoy-error">&nbsp;</div>
+      <div class="modal-actions" style="flex-direction:column;gap:8px;">
+        <button class="btn btn-primary" onclick="saveDecoySecret()" style="width:100%;">Save</button>
+        <button class="btn btn-ghost" id="decoy-disable-btn" onclick="disableDecoy()" style="width:100%;display:none;color:var(--danger);">Turn off decoy vault</button>
+        <button class="btn btn-ghost" onclick="closeDecoySetup()" style="width:100%;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Intruder Selfie failed-attempts log -->
+  <div class="modal-overlay" id="intruder-log-overlay">
+    <div class="modal-card" style="max-height:80vh;overflow-y:auto;">
+      <h3>Failed attempts</h3>
+      <div id="intruder-log-list" style="max-height:340px;overflow-y:auto;"></div>
+      <div class="modal-actions" style="flex-direction:column;gap:8px;">
+        <button class="btn btn-ghost" onclick="clearIntruderLog()" style="width:100%;color:var(--danger);">Clear log</button>
+        <button class="btn btn-ghost" onclick="closeIntruderLog()" style="width:100%;">Close</button>
       </div>
     </div>
   </div>
@@ -1745,16 +1793,21 @@ let vault = {
   changingPassword: false,
   secretType: "password", // "password" | "pin"
   biometricEnabled: false,
-  biometricCredentialId: ""
+  biometricCredentialId: "",
+  decoyEnabled: false,
+  decoyPasswordHash: "",
+  decoyPasswordSalt: ""
 };
 let photos = []; // {id, src, albumId, caption}
 let albums = []; // {id, name}
 let currentFolderId = null; // the folder currently open in screen-folder, or '__favorites__'
 let selectionMode = false;
 let selectedPhotoIds = new Set();
-let sortOrder = 'newest'; // 'newest' | 'oldest'
+let sortOrder = 'newest'; // 'newest' | 'oldest' | 'name' | 'size'
 let autoLockMinutes = 0; // 0 = off
 let autoLockTimer = null;
+let intruderSelfieEnabled = false; // captures a front-camera photo on a failed unlock attempt
+let decoyModeActive = false; // true when the vault currently open is the decoy, not the real one
 let gridColumns = 3;
 let slideshowTimer = null;
 let slideshowList = [];
@@ -1856,13 +1909,34 @@ async function persistVaultConfig(){
     answerSalt: vault.answerSalt,
     secretType: vault.secretType,
     biometricEnabled: vault.biometricEnabled,
-    biometricCredentialId: vault.biometricCredentialId
+    biometricCredentialId: vault.biometricCredentialId,
+    decoyEnabled: vault.decoyEnabled,
+    decoyPasswordHash: vault.decoyPasswordHash,
+    decoyPasswordSalt: vault.decoyPasswordSalt
   });
 }
 async function persistLibrary(){
+  if(decoyModeActive){
+    await dbSet('decoy_photos', photos);
+    await dbSet('decoy_albums', albums);
+    return; // never touch the real vault's data while the decoy is open
+  }
   await dbSet('photos', photos);
   await dbSet('albums', albums);
   updateAppBadge();
+}
+async function loadRealLibraryIntoMemory(){
+  const savedPhotos = await dbGet('photos');
+  const savedAlbums = await dbGet('albums');
+  photos = savedPhotos || [];
+  albums = savedAlbums || [];
+  migrateOrphanPhotos();
+}
+async function loadDecoyLibraryIntoMemory(){
+  const savedPhotos = await dbGet('decoy_photos');
+  const savedAlbums = await dbGet('decoy_albums');
+  photos = savedPhotos || [];
+  albums = savedAlbums || [];
 }
 function updateAppBadge(){
   if(!showAppBadge || !navigator.setAppBadge) return;
@@ -2367,6 +2441,23 @@ async function unlockVault(){
   const saltBytes = base64ToBuf(vault.passwordSalt);
   const hash = await hashSecret(secretValue, saltBytes);
   if(hash !== vault.passwordHash){
+    // Check the decoy secret before treating this as a wrong attempt —
+    // a match here silently opens the empty decoy vault instead.
+    if(vault.decoyEnabled && vault.decoyPasswordHash){
+      const decoySalt = base64ToBuf(vault.decoyPasswordSalt);
+      const decoyHash = await hashSecret(secretValue, decoySalt);
+      if(decoyHash === vault.decoyPasswordHash){
+        document.getElementById('lock-pw').value = '';
+        lockPinBuffer = '';
+        lockPatternBuffer = [];
+        decoyModeActive = true;
+        sessionAuthSecret = null; // never silently back up the decoy to the real Drive account
+        await loadDecoyLibraryIntoMemory();
+        playIris(() => enterVault());
+        return;
+      }
+    }
+    if(intruderSelfieEnabled) captureIntruderSelfie();
     setError('lock', isPin ? 'That PIN isn\'t right. Try again.' : (isPattern ? 'That pattern isn\'t right. Try again.' : 'That password isn\'t right. Try again.'));
     lockPinBuffer = '';
     if(isPin) renderPinDots('lock-pin-dots', 0);
@@ -2377,12 +2468,134 @@ async function unlockVault(){
   lockPinBuffer = '';
   lockPatternBuffer = [];
   sessionAuthSecret = secretValue;
+  if(decoyModeActive){
+    // coming back from the decoy vault with the real secret — swap back in the real library
+    decoyModeActive = false;
+    await loadRealLibraryIntoMemory();
+  }
   if(vault.changingPassword){
     vault.changingPassword = false;
     goTo('screen-forgot-2');
     return;
   }
   playIris(() => enterVault());
+}
+
+/* Fires on a wrong unlock attempt when Intruder Selfie is on. Best-effort and
+   silent: if the camera is denied or unavailable, it just does nothing rather
+   than block or slow down the lock screen. */
+async function captureIntruderSelfie(){
+  try{
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+    const video = document.createElement('video');
+    video.muted = true;
+    video.playsInline = true;
+    video.srcObject = stream;
+    await video.play();
+    await new Promise(r => setTimeout(r, 350)); // give the camera a moment to focus/expose
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth || 320;
+    canvas.height = video.videoHeight || 240;
+    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+    stream.getTracks().forEach(t => t.stop());
+
+    const log = (await dbGet('intruderLog')) || [];
+    log.unshift({ id: Date.now(), src: dataUrl, at: Date.now() });
+    if(log.length > 20) log.length = 20; // keep the log from growing forever
+    await dbSet('intruderLog', log);
+  }catch(e){ /* camera denied/unavailable — nothing to do */ }
+}
+
+async function openIntruderLog(){
+  const log = (await dbGet('intruderLog')) || [];
+  const listEl = document.getElementById('intruder-log-list');
+  if(!listEl) return;
+  if(log.length === 0){
+    listEl.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;">No failed attempts recorded</div>';
+  } else {
+    listEl.innerHTML = log.map(entry => {
+      const d = new Date(entry.at);
+      const when = d.toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'}) + ' · ' + d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
+      return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">'
+        + '<img src="'+entry.src+'" style="width:52px;height:52px;border-radius:10px;object-fit:cover;">'
+        + '<div style="flex:1;font-size:13px;color:var(--text-muted);">'+when+'</div>'
+        + '<button onclick="deleteIntruderEntry('+entry.id+')" style="font-size:12px;background:none;color:var(--text-muted);border:1px solid var(--border);border-radius:8px;padding:6px 8px;cursor:pointer;">✕</button>'
+        + '</div>';
+    }).join('');
+  }
+  document.getElementById('intruder-log-overlay').classList.add('active');
+}
+function closeIntruderLog(){
+  document.getElementById('intruder-log-overlay').classList.remove('active');
+}
+async function deleteIntruderEntry(id){
+  let log = (await dbGet('intruderLog')) || [];
+  log = log.filter(e => e.id !== id);
+  await dbSet('intruderLog', log);
+  openIntruderLog();
+}
+async function clearIntruderLog(){
+  if(!confirm('Clear the entire failed-attempts log?')) return;
+  await dbSet('intruderLog', []);
+  openIntruderLog();
+}
+async function toggleIntruderSelfie(){
+  if(!intruderSelfieEnabled){
+    try{
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+      stream.getTracks().forEach(t => t.stop());
+    }catch(e){
+      showToast('Camera access is needed for Intruder Selfie');
+      return;
+    }
+  }
+  intruderSelfieEnabled = !intruderSelfieEnabled;
+  persistAppSettings();
+  const t = document.getElementById('intruder-selfie-toggle');
+  if(t) t.classList.toggle('on', intruderSelfieEnabled);
+  showToast(intruderSelfieEnabled ? '✓ Intruder Selfie enabled' : 'Intruder Selfie off');
+}
+
+function openDecoySetup(){
+  document.getElementById('decoy-pw').value = '';
+  document.getElementById('decoy-pw2').value = '';
+  clearError('decoy');
+  const disableBtn = document.getElementById('decoy-disable-btn');
+  if(disableBtn) disableBtn.style.display = vault.decoyEnabled ? 'block' : 'none';
+  const hint = document.getElementById('decoy-status-hint');
+  if(hint) hint.textContent = vault.decoyEnabled ? 'A decoy password is currently set. Enter a new one below to change it.' : 'Set a separate password that opens an empty, harmless-looking vault.';
+  document.getElementById('decoy-overlay').classList.add('active');
+}
+function closeDecoySetup(){
+  document.getElementById('decoy-overlay').classList.remove('active');
+}
+async function saveDecoySecret(){
+  const pw  = document.getElementById('decoy-pw').value;
+  const pw2 = document.getElementById('decoy-pw2').value;
+  if(!pw || pw.length < 4){ setError('decoy','Use at least 4 characters.'); return; }
+  if(pw !== pw2){ setError('decoy','The two entries don\'t match.'); return; }
+  const saltCheck = base64ToBuf(vault.passwordSalt);
+  const realHash = await hashSecret(pw, saltCheck);
+  if(realHash === vault.passwordHash){ setError('decoy','This can\'t be the same as your real password.'); return; }
+
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  vault.decoyPasswordHash = await hashSecret(pw, salt);
+  vault.decoyPasswordSalt = bufToBase64(salt);
+  vault.decoyEnabled = true;
+  await persistVaultConfig();
+  closeDecoySetup();
+  showToast('✓ Decoy vault set up');
+}
+async function disableDecoy(){
+  if(!confirm('Turn off the decoy vault? Its password will stop working.')) return;
+  vault.decoyEnabled = false;
+  vault.decoyPasswordHash = '';
+  vault.decoyPasswordSalt = '';
+  await persistVaultConfig();
+  closeDecoySetup();
+  showToast('Decoy vault turned off');
 }
 
 function lockVaultNow(){
@@ -3056,13 +3269,27 @@ function getFolderPhotos(){
   if(currentFolderId === '__favorites__') list = photos.filter(p => p.favorite && !p.deletedAt);
   else if(currentFolderId === '__trash__') list = photos.filter(p => p.deletedAt);
   else list = photos.filter(p => p.albumId === currentFolderId && !p.deletedAt);
-  list = list.slice().sort((a, b) => sortOrder === 'newest' ? b.id - a.id : a.id - b.id);
+  list = list.slice().sort((a, b) => {
+    if(sortOrder === 'newest') return b.id - a.id;
+    if(sortOrder === 'oldest') return a.id - b.id;
+    if(sortOrder === 'name'){
+      const an = (a.caption || '').trim(), bn = (b.caption || '').trim();
+      if(!an && !bn) return b.id - a.id;
+      if(!an) return 1;   // untitled items sort after named ones
+      if(!bn) return -1;
+      return an.localeCompare(bn, undefined, {sensitivity:'base'});
+    }
+    if(sortOrder === 'size') return (b.src||'').length - (a.src||'').length; // largest first
+    return b.id - a.id;
+  });
   return list;
 }
 
 function toggleSortOrder(){
-  sortOrder = sortOrder === 'newest' ? 'oldest' : 'newest';
-  showToast(sortOrder === 'newest' ? 'Sorted: newest first' : 'Sorted: oldest first');
+  const order = ['newest','oldest','name','size'];
+  sortOrder = order[(order.indexOf(sortOrder) + 1) % order.length];
+  const labels = { newest:'Sorted: newest first', oldest:'Sorted: oldest first', name:'Sorted: by name', size:'Sorted: largest first' };
+  showToast(labels[sortOrder]);
   renderFolderPhotos();
 }
 
@@ -4002,6 +4229,10 @@ function openSettings(){
   // refresh auto-backup status label
   const abLabel = document.getElementById('auto-backup-status-label');
   if(abLabel) abLabel.textContent = autoBackupSettings.enabled ? capitalise(autoBackupSettings.frequency) : 'Off';
+  const intruderToggle = document.getElementById('intruder-selfie-toggle');
+  if(intruderToggle) intruderToggle.classList.toggle('on', intruderSelfieEnabled);
+  const decoyLabel = document.getElementById('decoy-status-label');
+  if(decoyLabel) decoyLabel.textContent = vault.decoyEnabled ? 'On' : 'Off';
   document.getElementById('sheet-overlay').classList.add('active');
   document.getElementById('settings-sheet').classList.add('open');
 }
@@ -4015,7 +4246,7 @@ async function confirmWipe(){
     albums = [];
     currentFolderId = null;
     searchQuery = "";
-    vault = { passwordSet:false, passwordHash:"", passwordSalt:"", question:"", answerHash:"", answerSalt:"", changingPassword:false, secretType:"password", biometricEnabled:false, biometricCredentialId:"" };
+    vault = { passwordSet:false, passwordHash:"", passwordSalt:"", question:"", answerHash:"", answerSalt:"", changingPassword:false, secretType:"password", biometricEnabled:false, biometricCredentialId:"", decoyEnabled:false, decoyPasswordHash:"", decoyPasswordSalt:"" };
     await dbClearAll();
     await persistAppSettings();
     updateAppBadge();
@@ -4270,7 +4501,28 @@ function toggleAutoBackup(){
   saveAutoBackupSettings();
   refreshAutoBackupUI();
   showToast(autoBackupSettings.enabled ? '✓ Auto backup enabled' : 'Auto backup off');
-  if(autoBackupSettings.enabled) scheduleAutoBackupCheck();
+  if(autoBackupSettings.enabled){
+    scheduleAutoBackupCheck();
+    requestBackupNotificationPermission();
+  }
+}
+
+function requestBackupNotificationPermission(){
+  if('Notification' in window && Notification.permission === 'default'){
+    Notification.requestPermission();
+  }
+}
+
+function notifyBackupComplete(count, sizeLabel){
+  try{
+    if('Notification' in window && Notification.permission === 'granted'){
+      new Notification('V Vault backed up', {
+        body: count + (count === 1 ? ' photo' : ' photos') + ' backed up to Google Drive (' + sizeLabel + ')',
+        icon: 'icon-192.png',
+        silent: true
+      });
+    }
+  }catch(e){ /* Notification API unavailable in this context — not critical */ }
 }
 
 function setBackupFrequency(freq){
@@ -4465,7 +4717,7 @@ let appTheme = 'light';
 let appAccent = 'green';
 
 async function persistAppSettings(){
-  await dbSet('appSettings', { theme: appTheme, accent: appAccent, autoLockMinutes: autoLockMinutes, gridColumns: gridColumns, showAppBadge: showAppBadge, removeFromGalleryEnabled: removeFromGalleryEnabled, permissionsAsked: permissionsAsked });
+  await dbSet('appSettings', { theme: appTheme, accent: appAccent, autoLockMinutes: autoLockMinutes, gridColumns: gridColumns, showAppBadge: showAppBadge, removeFromGalleryEnabled: removeFromGalleryEnabled, permissionsAsked: permissionsAsked, intruderSelfieEnabled: intruderSelfieEnabled });
 }
 async function loadAppSettings(){
   try{
@@ -4478,6 +4730,7 @@ async function loadAppSettings(){
       showAppBadge = saved.showAppBadge !== false;
       removeFromGalleryEnabled = saved.removeFromGalleryEnabled !== false;
       permissionsAsked = !!saved.permissionsAsked;
+      intruderSelfieEnabled = !!saved.intruderSelfieEnabled;
     }
   }catch(err){
     // no saved settings yet — keep defaults
@@ -4488,6 +4741,8 @@ async function loadAppSettings(){
   if(sel) sel.value = String(autoLockMinutes);
   const badgeToggle = document.getElementById('badge-toggle');
   if(badgeToggle) badgeToggle.classList.toggle('on', showAppBadge);
+  const intruderToggle = document.getElementById('intruder-selfie-toggle');
+  if(intruderToggle) intruderToggle.classList.toggle('on', intruderSelfieEnabled);
 
   const isNativeMediaAvailable = !!(window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.VaultMedia);
   const galleryItem = document.getElementById('gallery-delete-item');
@@ -5018,6 +5273,7 @@ checkForSharedMedia();
       if(banner) banner.style.display = 'none';
       if(autoBackupRetryTimer){ clearTimeout(autoBackupRetryTimer); autoBackupRetryTimer = null; }
       if(!silent) showToast('✓ Backup saved to Google Drive!');
+      else notifyBackupComplete(autoBackupSettings.lastBackupCount, formatBytes(autoBackupSettings.lastBackupSize));
       // Best-effort: keep Drive tidy by trimming to the most recent backups,
       // same as WhatsApp only ever keeping the latest backup around.
       cleanupOldGdriveBackups(folderId).catch(()=>{});
