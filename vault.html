@@ -1668,8 +1668,17 @@
             </label>
           </div>
 
+          <!-- Wi-Fi only -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;">
+            <div>
+              <div style="font-size:13.5px;font-weight:500;">Back up on Wi-Fi only</div>
+              <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">Avoid using mobile data</div>
+            </div>
+            <div class="toggle-switch" id="wifi-only-toggle" onclick="toggleWifiOnly()"><div class="toggle-knob"></div></div>
+          </div>
+
           <!-- Status -->
-          <div style="margin-top:12px;padding:12px 14px;background:var(--bg-elevated);border-radius:10px;">
+          <div style="margin-top:4px;padding:12px 14px;background:var(--bg-elevated);border-radius:10px;">
             <div style="font-size:11.5px;color:var(--text-muted);font-weight:600;margin-bottom:8px;">BACKUP STATUS</div>
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
               <svg width="14" height="14" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="var(--accent)" stroke-width="1.4"/><path d="M6 9l2 2 4-4" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1678,6 +1687,10 @@
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
               <svg width="14" height="14" viewBox="0 0 18 18" fill="none"><path d="M9 2v4M9 12v4M2 9h4M12 9h4" stroke="var(--text-muted)" stroke-width="1.4" stroke-linecap="round"/></svg>
               <span style="font-size:13px;color:var(--text-muted);" id="ab-next-backup-label">Next: —</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+              <svg width="14" height="14" viewBox="0 0 18 18" fill="none"><rect x="3" y="7" width="12" height="8" rx="1.5" stroke="var(--text-muted)" stroke-width="1.4"/><path d="M6 7V5a3 3 0 0 1 6 0v2" stroke="var(--text-muted)" stroke-width="1.4"/></svg>
+              <span style="font-size:13px;color:var(--text-muted);" id="ab-backup-size-label">No backup yet</span>
             </div>
             <div style="display:flex;align-items:center;gap:8px;">
               <svg width="14" height="14" viewBox="0 0 87.3 78" fill="none"><path d="M6.6 66.85 3.8 72.2c-.6 1.1.2 2.4 1.4 2.4h29.3l3.8-7.75z" fill="#0066DA"/><path d="M44.6 66.85h29.4l3.8 7.75H48.4z" fill="#00AC47"/><path d="M29.8 66.85 22 52.75 5.3 66.85z" fill="#00832D"/><path d="m57.5 66.85 7.8-14.1 16.7 14.1z" fill="#2684FC"/><path d="M29.8 66.85 44.6 39.3 59.4 66.85z" fill="#00AC47"/><path d="M44.6 39.3 29.8 66.85h29.6z" fill="#00832D" opacity=".3"/><path d="M44.6 3.15 59.4 29.7H29.8z" fill="#EA4335"/><path d="M44.6 3.15 29.8 29.7H3.5L29.8 3.15z" fill="#FFBA00"/><path d="M44.6 3.15 59.4 29.7H85.8L59.4 3.15z" fill="#00832D"/><path d="M22 52.75 29.8 29.7H59.4l7.8 23.05z" fill="#FFBA00"/></svg>
@@ -1762,9 +1775,17 @@ let autoBackupSettings = {
   enabled: false,
   frequency: 'weekly',   // 'daily' | 'weekly' | 'monthly'
   lastBackupTime: null,
-  lastBackupCount: 0
+  lastBackupCount: 0,
+  lastBackupSize: 0,     // bytes, for the status card
+  wifiOnly: false,       // skip silent auto-backup on cellular data
+  retryScheduled: false  // true while a short retry timer is pending after a failed attempt
 };
 let autoBackupCheckTimer = null;
+let autoBackupRetryTimer = null;
+/* Vault password/PIN/pattern, held only in memory for this unlocked session so
+   scheduled backups can run silently (no re-prompt) while the vault is unlocked.
+   Never persisted, and cleared the moment the vault locks. */
+let sessionAuthSecret = null;
 
 const questionText = {
   pet: "What was the name of your first pet?",
@@ -2289,6 +2310,7 @@ async function createVault(){
   await persistVaultConfig();
   await persistLibrary();
 
+  sessionAuthSecret = secretValue;
   playIris(() => { enterVault(); showToast('Vault created'); showOnboarding(); });
 }
 
@@ -2354,6 +2376,7 @@ async function unlockVault(){
   document.getElementById('lock-pw').value = '';
   lockPinBuffer = '';
   lockPatternBuffer = [];
+  sessionAuthSecret = secretValue;
   if(vault.changingPassword){
     vault.changingPassword = false;
     goTo('screen-forgot-2');
@@ -2372,6 +2395,7 @@ function lockVaultNow(){
   document.getElementById('lightbox').classList.remove('active');
   if(slideshowTimer) stopSlideshow();
 
+  sessionAuthSecret = null;
   goTo('screen-lock');
   document.getElementById('lock-pw').value = '';
   clearError('lock');
@@ -2502,6 +2526,7 @@ async function resetPassword(){
 
   document.getElementById('reset-pw').value = '';
   document.getElementById('reset-pw2').value = '';
+  sessionAuthSecret = secretValue;
   playIris(() => { enterVault(); showToast(isPin ? 'PIN reset' : (isPattern ? 'Pattern reset' : 'Password reset')); });
 }
 
@@ -4278,17 +4303,35 @@ function refreshAutoBackupUI(){
   const radios = document.querySelectorAll('input[name="backup-freq"]');
   radios.forEach(r => { r.checked = r.value === autoBackupSettings.frequency; });
 
+  // Wi-Fi only toggle
+  const wifiToggle = document.getElementById('wifi-only-toggle');
+  if(wifiToggle) wifiToggle.classList.toggle('on', !!autoBackupSettings.wifiOnly);
+
   // last backup label
   const lastEl = document.getElementById('ab-last-backup-label');
   const nextEl = document.getElementById('ab-next-backup-label');
+  const sizeEl = document.getElementById('ab-backup-size-label');
   if(lastEl){
     lastEl.textContent = autoBackupSettings.lastBackupTime
       ? 'Last backup: ' + friendlyDate(autoBackupSettings.lastBackupTime)
       : 'Last backup: Never';
   }
   if(nextEl && autoBackupSettings.enabled){
-    nextEl.textContent = 'Next: ' + nextBackupDueLabel();
+    nextEl.textContent = autoBackupSettings.retryScheduled
+      ? 'Retrying shortly…'
+      : 'Next: ' + nextBackupDueLabel();
   }
+  if(sizeEl){
+    sizeEl.textContent = autoBackupSettings.lastBackupTime
+      ? formatBytes(autoBackupSettings.lastBackupSize) + ' · ' + autoBackupSettings.lastBackupCount + ' photos'
+      : 'No backup yet';
+  }
+}
+
+function formatBytes(bytes){
+  if(!bytes) return '0 KB';
+  if(bytes < 1024*1024) return (bytes/1024).toFixed(0) + ' KB';
+  return (bytes/(1024*1024)).toFixed(1) + ' MB';
 }
 
 function nextBackupDueLabel(){
@@ -4324,18 +4367,51 @@ function scheduleAutoBackupCheck(){
 function checkAutoBackupDue(){
   if(!autoBackupSettings.enabled) return;
   const banner = document.getElementById('backup-reminder-banner');
-  if(!banner) return;
-  if(isBackupOverdue()){
-    const textEl = document.getElementById('backup-reminder-text');
-    if(textEl){
-      textEl.textContent = autoBackupSettings.lastBackupTime
-        ? 'Last backup: ' + friendlyDate(autoBackupSettings.lastBackupTime)
-        : 'Last backup: Never';
-    }
-    banner.style.display = 'flex';
-  } else {
-    banner.style.display = 'none';
+  if(!isBackupOverdue()){
+    if(banner) banner.style.display = 'none';
+    return;
   }
+  // Overdue: if the vault is unlocked and signed in to Drive, back up silently
+  // (no re-prompt) — same idea as WhatsApp's silent background backup.
+  if(typeof window.gdriveIsSignedIn === 'function' && window.gdriveIsSignedIn() && sessionAuthSecret && !autoBackupSettings.retryScheduled){
+    const onWifi = isOnWifi();
+    if(!autoBackupSettings.wifiOnly || onWifi){
+      window.performGdriveBackup(sessionAuthSecret, { silent:true });
+      return; // performGdriveBackup hides the banner itself once it finishes
+    }
+  }
+  if(!banner) return;
+  const textEl = document.getElementById('backup-reminder-text');
+  if(textEl){
+    textEl.textContent = autoBackupSettings.lastBackupTime
+      ? 'Last backup: ' + friendlyDate(autoBackupSettings.lastBackupTime)
+      : 'Last backup: Never';
+  }
+  banner.style.display = 'flex';
+}
+
+/* Network Information API isn't available everywhere — when we can't tell,
+   assume it's fine rather than silently skip backups forever. */
+function isOnWifi(){
+  const c = navigator.connection || navigator.webkitConnection || navigator.mozConnection;
+  if(!c || !c.type) return true;
+  return c.type === 'wifi' || c.type === 'ethernet';
+}
+
+function scheduleBackupRetry(){
+  autoBackupSettings.retryScheduled = true;
+  saveAutoBackupSettings();
+  if(autoBackupRetryTimer) clearTimeout(autoBackupRetryTimer);
+  autoBackupRetryTimer = setTimeout(() => {
+    autoBackupSettings.retryScheduled = false;
+    checkAutoBackupDue();
+  }, 15 * 60 * 1000); // back off 15 minutes, then try again automatically
+}
+
+function toggleWifiOnly(){
+  autoBackupSettings.wifiOnly = !autoBackupSettings.wifiOnly;
+  saveAutoBackupSettings();
+  refreshAutoBackupUI();
 }
 
 function dismissBackupReminder(){
@@ -4832,6 +4908,7 @@ checkForSharedMedia();
           saveGdriveSession(expiresIn);
           showGdriveSignedIn();
           showToast('✓ Connected to Google Drive!');
+          checkForExistingBackupOnSignIn();
         } else {
           showToast('Sign in cancelled');
         }
@@ -4858,6 +4935,7 @@ checkForSharedMedia();
         saveGdriveSession(resp.expires_in);
         showGdriveSignedIn();
         showToast('✓ Connected to Google Drive!');
+        checkForExistingBackupOnSignIn();
       }
     });
     client.requestAccessToken();
@@ -4881,8 +4959,16 @@ checkForSharedMedia();
     if(!gdriveToken){ showToast('Please sign in with Google first'); return; }
     const btn = document.getElementById('gdrive-backup-now-btn');
     if(btn){ btn.disabled = true; btn.textContent = 'Backing up…'; }
+    if(sessionAuthSecret){
+      // vault is already unlocked this session — no need to ask for the
+      // password again, same as WhatsApp never re-prompting mid-session
+      await performGdriveBackup(sessionAuthSecret);
+      return;
+    }
     openBackupPwModalForGdrive();
   };
+
+  window.gdriveIsSignedIn = function(){ return !!gdriveToken; };
 
   window.gdriveRestorePrompt = async function(){
     if(!gdriveToken){ showToast('Please sign in with Google first'); return; }
@@ -4894,10 +4980,14 @@ checkForSharedMedia();
     document.getElementById('gdrive-restore-overlay').classList.remove('active');
   };
 
-  /* Called by backup-pw modal after password confirmed — mode 'gdrive-create' */
-  window.performGdriveBackup = async function(password){
+  /* Called by backup-pw modal after password confirmed — mode 'gdrive-create'.
+     opts.silent suppresses toasts for backups that run automatically in the
+     background, so the user isn't interrupted by something routine. */
+  window.performGdriveBackup = async function(password, opts){
+    opts = opts || {};
+    const silent = !!opts.silent;
     try{
-      showToast('Saving to Google Drive…');
+      if(!silent) showToast('Saving to Google Drive…');
       const saltBytes = crypto.getRandomValues(new Uint8Array(16));
       const ivBytes   = crypto.getRandomValues(new Uint8Array(12));
       const key       = await deriveKey(password, saltBytes);
@@ -4912,28 +5002,70 @@ checkForSharedMedia();
         iv:   bufToBase64(ivBytes),
         ciphertext: bufToBase64(cipherBuf)
       };
+      const backupJson = JSON.stringify(backupObj);
       const dateStr  = new Date().toISOString().slice(0,10);
       const fileName = 'vvault-backup-' + dateStr + '-' + Date.now() + '.vault';
       const folderId = await ensureGdriveFolder();
-      await uploadToGdrive(fileName, JSON.stringify(backupObj), folderId);
+      await uploadToGdrive(fileName, backupJson, folderId);
 
       autoBackupSettings.lastBackupTime  = Date.now();
       autoBackupSettings.lastBackupCount = photos.filter(p=>!p.deletedAt).length;
+      autoBackupSettings.lastBackupSize  = backupJson.length;
+      autoBackupSettings.retryScheduled  = false;
       saveAutoBackupSettings();
       refreshAutoBackupUI();
       const banner = document.getElementById('backup-reminder-banner');
       if(banner) banner.style.display = 'none';
-      showToast('✓ Backup saved to Google Drive!');
+      if(autoBackupRetryTimer){ clearTimeout(autoBackupRetryTimer); autoBackupRetryTimer = null; }
+      if(!silent) showToast('✓ Backup saved to Google Drive!');
+      // Best-effort: keep Drive tidy by trimming to the most recent backups,
+      // same as WhatsApp only ever keeping the latest backup around.
+      cleanupOldGdriveBackups(folderId).catch(()=>{});
     }catch(err){
       console.error('GDrive backup error', err);
       if(err.message === 'GDRIVE_AUTH_EXPIRED'){
-        showToast('Session expired — please sign in with Google again');
+        if(!silent) showToast('Session expired — please sign in with Google again');
+      } else if(silent){
+        scheduleBackupRetry();
       } else {
         showToast('Backup failed — try again');
       }
     }finally{
       const btn = document.getElementById('gdrive-backup-now-btn');
       if(btn){ btn.disabled = false; btn.textContent = 'Back up now'; }
+    }
+  };
+
+  const MAX_GDRIVE_BACKUPS = 5;
+  async function cleanupOldGdriveBackups(folderId){
+    const r = await gdriveApiFetch(
+      "https://www.googleapis.com/drive/v3/files?q='"+folderId+"'+in+parents+and+trashed%3Dfalse&orderBy=createdTime+desc&fields=files(id,createdTime)&pageSize=50",
+      {headers:{Authorization:'Bearer '+gdriveToken}}
+    );
+    const j = await r.json();
+    const files = j.files || [];
+    const stale = files.slice(MAX_GDRIVE_BACKUPS);
+    for(const f of stale){
+      try{ await deleteGdriveFile(f.id); }catch(e){ /* not fatal — next cleanup will retry */ }
+    }
+  }
+
+  async function deleteGdriveFile(fileId){
+    const r = await gdriveApiFetch('https://www.googleapis.com/drive/v3/files/'+fileId, {
+      method:'DELETE',
+      headers:{Authorization:'Bearer '+gdriveToken}
+    });
+    if(!r.ok && r.status !== 404) throw new Error('Delete failed: '+r.status);
+  }
+
+  window.gdriveDeleteBackup = async function(fileId){
+    if(!confirm('Delete this backup? This cannot be undone.')) return;
+    try{
+      await deleteGdriveFile(fileId);
+      showToast('Backup deleted');
+      await loadGdriveBackupList();
+    }catch(err){
+      showToast('Could not delete — try again');
     }
   };
 
@@ -5142,12 +5274,39 @@ checkForSharedMedia();
           +'<div style="font-size:13px;font-weight:500;">'+date+' · '+time+'</div>'
           +(size?'<div style="font-size:11.5px;color:var(--text-muted);">'+size+'</div>':'')
           +'</div>'
+          +'<div style="display:flex;gap:6px;">'
           +'<button onclick="gdriveRestoreFile(\''+f.id+'\',\''+f.name+'\')" style="font-size:12px;background:var(--accent-soft);color:var(--accent);border:none;border-radius:8px;padding:7px 14px;cursor:pointer;font-weight:500;">Restore</button>'
+          +'<button onclick="gdriveDeleteBackup(\''+f.id+'\')" title="Delete backup" style="font-size:12px;background:none;color:var(--text-muted);border:1px solid var(--border);border-radius:8px;padding:7px 9px;cursor:pointer;">'
+          +'<svg width="13" height="13" viewBox="0 0 18 18" fill="none"><path d="M3.5 5h11M7 5V3.5h4V5M4.5 5l.6 9.2c.05.7.65 1.3 1.35 1.3h5.1c.7 0 1.3-.6 1.35-1.3L13.5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+          +'</button>'
+          +'</div>'
           +'</div>';
       }).join('');
     }catch(err){
       listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--danger);font-size:13px;">Failed to load — try again</div>';
     }
+  }
+
+  /* Mirrors WhatsApp's "restore from backup?" prompt right after signing in —
+     only offered when this vault looks freshly set up, so we never suggest
+     overwriting photos someone has already added here. */
+  async function checkForExistingBackupOnSignIn(){
+    try{
+      const activeCount = photos.filter(p => !p.deletedAt).length;
+      if(activeCount > 0) return;
+      const folderId = await ensureGdriveFolder();
+      const r = await gdriveApiFetch(
+        "https://www.googleapis.com/drive/v3/files?q='"+folderId+"'+in+parents+and+trashed%3Dfalse&orderBy=createdTime+desc&fields=files(id,name,createdTime)&pageSize=1",
+        {headers:{Authorization:'Bearer '+gdriveToken}}
+      );
+      const j = await r.json();
+      const files = j.files || [];
+      if(files.length === 0) return;
+      const when = new Date(files[0].createdTime).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+      if(confirm('A backup from '+when+' was found on Google Drive. Restore it now?')){
+        window.gdriveRestoreFile(files[0].id, files[0].name);
+      }
+    }catch(e){ /* not critical — the Restore button is always available */ }
   }
 
   /* ── Hook into backup-pw modal for gdrive modes ── */
