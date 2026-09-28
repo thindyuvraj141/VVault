@@ -11,6 +11,7 @@ import android.app.PendingIntent;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -32,6 +33,11 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
 import com.getcapacitor.annotation.PermissionCallback;
 
+import com.google.android.gms.auth.api.identity.AuthorizationRequest;
+import com.google.android.gms.auth.api.identity.AuthorizationResult;
+import com.google.android.gms.auth.api.identity.Identity;
+import com.google.android.gms.common.api.Scope;
+
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -49,12 +55,15 @@ import java.util.List;
  * confirmed request (MediaStore.createDeleteRequest) before any app can
  * delete another app's media. That's why this needs to be native code
  * instead of something addable to the HTML file directly.
+ *
+ * It also provides getAccessToken() for Google Drive backup (see below).
  */
-// requestCodes MUST list the delete-dialog code (9821 = DELETE_REQUEST_CODE below),
-// otherwise Capacitor never calls handleOnActivityResult and the JS promise hangs.
+// requestCodes MUST list every startIntentSenderForResult code used below
+// (9821 = DELETE_REQUEST_CODE, 9932 = AUTH_REQUEST_CODE), otherwise Capacitor
+// never calls handleOnActivityResult and the JS promise hangs.
 @CapacitorPlugin(
     name = "VaultMedia",
-    requestCodes = {9821},
+    requestCodes = {9821, 9932},
     permissions = {
         @Permission(alias = "camera", strings = { Manifest.permission.CAMERA }),
         // Android 13+ (API 33+): photos and videos
@@ -65,6 +74,91 @@ import java.util.List;
     }
 )
 public class VaultMediaPlugin extends Plugin {
+
+    /* ---------------- Google Drive: silent access token ----------------
+       Uses Google's Authorization API (what native apps like WhatsApp use).
+       The first call shows Google's consent screen once. After that every
+       call returns a fresh access token with NO screen, so the Drive login
+       never expires from the user's point of view. The app is identified to
+       Google by its package name + signing SHA-1 (the "Android" OAuth client).
+
+       JS: VaultMedia.getAccessToken({ interactive: true | false })
+       interactive=false rejects with "needs_consent" instead of showing UI. */
+    private static final int AUTH_REQUEST_CODE = 9932;
+    private String pendingAuthCallbackId;
+
+    @PluginMethod
+    public void getAccessToken(final PluginCall call) {
+        final boolean interactive = Boolean.TRUE.equals(call.getBoolean("interactive", false));
+
+        List<Scope> scopes = new ArrayList<>();
+        scopes.add(new Scope("https://www.googleapis.com/auth/drive.file"));
+        scopes.add(new Scope("email"));
+        scopes.add(new Scope("profile"));
+
+        AuthorizationRequest request = AuthorizationRequest.builder()
+                .setRequestedScopes(scopes)
+                .build();
+
+        Identity.getAuthorizationClient(getActivity())
+                .authorize(request)
+                .addOnSuccessListener(result -> {
+                    if (result.hasResolution()) {
+                        // User hasn't approved yet (or approval was revoked).
+                        if (!interactive) {
+                            call.reject("needs_consent");
+                            return;
+                        }
+                        try {
+                            call.setKeepAlive(true);
+                            bridge.saveCall(call);
+                            pendingAuthCallbackId = call.getCallbackId();
+                            getActivity().startIntentSenderForResult(
+                                    result.getPendingIntent().getIntentSender(),
+                                    AUTH_REQUEST_CODE, null, 0, 0, 0
+                            );
+                        } catch (IntentSender.SendIntentException e) {
+                            pendingAuthCallbackId = null;
+                            call.reject("Could not open Google consent screen", e);
+                        }
+                    } else {
+                        // Already approved earlier: token comes back silently.
+                        resolveAuthToken(call, result);
+                    }
+                })
+                .addOnFailureListener(e -> call.reject("authorize_failed: " + e.getMessage(), e));
+    }
+
+    private void resolveAuthToken(PluginCall call, AuthorizationResult result) {
+        String token = result.getAccessToken();
+        if (token == null) {
+            call.reject("no_token");
+            return;
+        }
+        JSObject ret = new JSObject();
+        ret.put("accessToken", token);
+        call.resolve(ret);
+    }
+
+    private void handleAuthResult(int resultCode, Intent data) {
+        if (pendingAuthCallbackId == null) return;
+        PluginCall savedCall = bridge.getSavedCall(pendingAuthCallbackId);
+        pendingAuthCallbackId = null;
+        if (savedCall == null) return;
+        try {
+            if (resultCode != Activity.RESULT_OK) {
+                savedCall.reject("cancelled");
+            } else {
+                AuthorizationResult result =
+                        Identity.getAuthorizationClient(getActivity()).getAuthorizationResultFromIntent(data);
+                resolveAuthToken(savedCall, result);
+            }
+        } catch (Exception e) {
+            savedCall.reject("authorize_failed: " + e.getMessage(), e);
+        } finally {
+            bridge.releaseCall(savedCall);
+        }
+    }
 
     /* ---------------- "Share to V Vault" (Android Share sheet) ----------------
        MainActivity hands photos/videos shared from Gallery (or any app) to this
@@ -369,82 +463,4 @@ public class VaultMediaPlugin extends Plugin {
 
         int deletedDirectly = 0;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && Environment.isExternalStorageManager()) {
-            // "All files access" is on: no confirmation dialog needed, delete directly.
-            java.util.List<Uri> remaining = new java.util.ArrayList<>();
-            for (Uri u : uris) {
-                try {
-                    if (getContext().getContentResolver().delete(u, null, null) > 0) {
-                        deletedDirectly++;
-                        continue;
-                    }
-                } catch (Exception e) {
-                    // fall back to the system dialog for this one
-                }
-                remaining.add(u);
-            }
-            uris = remaining;
-            if (uris.isEmpty()) {
-                JSObject done = new JSObject();
-                done.put("deleted", deletedDirectly);
-                call.resolve(done);
-                return;
-            }
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            // Android 11+: one system confirmation dialog covers every file
-            // in the batch. The user taps "Allow" once; there is no way to
-            // skip this dialog — it's an OS privacy requirement, not
-            // something this plugin can bypass.
-            //
-            // We launch this the plain Android way (Activity.startIntentSenderForResult)
-            // and catch the result in handleOnActivityResult below, rather than
-            // relying on a newer Capacitor Plugin helper method that may not
-            // exist in every Capacitor version.
-            try {
-                PendingIntent pendingIntent =
-                        MediaStore.createDeleteRequest(getContext().getContentResolver(), uris);
-                call.setKeepAlive(true);
-                bridge.saveCall(call);
-                pendingDeleteCallbackId = call.getCallbackId();
-                pendingDeleteCount = uris.size() + deletedDirectly;
-                getActivity().startIntentSenderForResult(
-                        pendingIntent.getIntentSender(), DELETE_REQUEST_CODE,
-                        null, 0, 0, 0
-                );
-            } catch (Exception e) {
-                call.reject("Could not request delete", e);
-            }
-        } else {
-            // Android 10 and below: try a direct delete per file. This only
-            // succeeds for files the app itself owns, or where the user has
-            // already granted broad storage access — otherwise it silently
-            // fails, which is fine since the vault copy already exists.
-            int deleted = 0;
-            for (Uri uri : uris) {
-                try {
-                    if (getContext().getContentResolver().delete(uri, null, null) > 0) deleted++;
-                } catch (Exception e) {
-                    // e.g. RecoverableSecurityException — skip this file.
-                }
-            }
-            JSObject ret = new JSObject();
-            ret.put("deleted", deleted);
-            call.resolve(ret);
-        }
-    }
-
-    @Override
-    protected void handleOnActivityResult(int requestCode, int resultCode, Intent data) {
-        super.handleOnActivityResult(requestCode, resultCode, data);
-        if (requestCode != DELETE_REQUEST_CODE || pendingDeleteCallbackId == null) return;
-        PluginCall savedCall = bridge.getSavedCall(pendingDeleteCallbackId);
-        pendingDeleteCallbackId = null;
-        if (savedCall == null) return;
-        JSObject ret = new JSObject();
-        // RESULT_OK means the user approved the whole batch.
-        ret.put("deleted", resultCode == Activity.RESULT_OK ? pendingDeleteCount : 0);
-        savedCall.resolve(ret);
-        bridge.releaseCall(savedCall);
-    }
-}
+            // "All files access" is on: no confirmation dialog needed, 
