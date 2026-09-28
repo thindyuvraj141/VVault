@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>V Vault — Privacy Policy</title>
+<style>
+  :root{
+    --bg:#FFFFFF;
+    --bg-elevated:#F0F2F5;
+    --border:#E9EDEF;
+    --text:#111B21;
+    --text-muted:#667781;
+    --text-faint:#8696A0;
+    --accent-rgb:37,211,102;
+    --accent:rgb(var(--accent-rgb));
+    --accent-soft:rgba(var(--accent-rgb),0.14);
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+    box-sizing:border-box;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0B141A;
+      --bg-elevated:#202C33;
+      --border:#2A3942;
+      --text:#E9EDEF;
+      --text-muted:#8696A0;
+      --text-faint:#667781;
+      --accent-rgb:0,168,132;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0B141A;
+    --bg-elevated:#202C33;
+    --border:#2A3942;
+    --text:#E9EDEF;
+    --text-muted:#8696A0;
+    --text-faint:#667781;
+    --accent-rgb:0,168,132;
+  }
+  html,body{ height:100%; }
+  html{ scroll-padding-top:env(safe-area-inset-top,0px); }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{ font-family:'Roboto','Inter',sans-serif; font-weight:700; letter-spacing:-0.01em; }
+  header{
+    position:sticky;
+    top:0;
+    padding-top:env(safe-area-inset-top,0px);
+    background:var(--bg);
+    border-bottom:1px solid var(--border);
+    z-index:5;
+  }
+  .header-inner{
+    max-width:640px;
+    margin:0 auto;
+    padding:14px 20px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .shield{
+    width:32px;height:32px;border-radius:9px;
+    background:var(--accent-soft);
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+    color:var(--accent);
+  }
+  .brand{ font-size:16px; font-weight:700; }
+  .brand .sub{ font-size:11.5px; font-weight:500; color:var(--text-muted); margin-top:1px; }
+  main{
+    max-width:640px;
+    margin:0 auto;
+    padding:22px 20px calc(60px + env(safe-area-inset-bottom,0px));
+  }
+  .updated{ font-size:12px; color:var(--text-faint); margin:0 0 22px; }
+  .intro{
+    background:var(--bg-elevated);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:16px 18px;
+    font-size:14px;
+    line-height:1.6;
+    margin-bottom:26px;
+  }
+  .intro strong{ color:var(--text); }
+  section{ margin-bottom:22px; }
+  section h2{
+    font-size:15px;
+    margin:0 0 8px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  section h2 .dot{
+    width:6px;height:6px;border-radius:50%;
+    background:var(--accent);
+    flex-shrink:0;
+  }
+  section p{
+    font-size:13.5px;
+    line-height:1.6;
+    color:var(--text-muted);
+    margin:0 0 8px;
+  }
+  section ul{ margin:0 0 8px; padding-left:20px; }
+  section li{ font-size:13.5px; line-height:1.6; color:var(--text-muted); margin-bottom:4px; }
+  footer{
+    max-width:640px;
+    margin:0 auto;
+    padding:0 20px calc(28px + env(safe-area-inset-bottom,0px));
+    font-size:11.5px;
+    color:var(--text-faint);
+    text-align:center;
+  }
+  a{ color:var(--accent); text-decoration:none; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="shield">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2 3.5 4.2v4.1c0 3.4 2.3 6.4 5.5 7.5 3.2-1.1 5.5-4.1 5.5-7.5V4.2L9 2Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M6.7 9.1l1.6 1.6 3-3.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="brand">V Vault<div class="sub">Privacy Policy</div></div>
+  </div>
+</header>
+
+<main>
+  <p class="updated">Last updated: September 2026</p>
+
+  <div class="intro">
+    <strong>V Vault does not upload, collect, or share your photos or videos.</strong>
+    No server ever receives your photos, videos or backups, and there are no analytics. Your vault stays on your device. The only
+    account involved is your own Google account, used to verify your email and, if you
+    choose, to store encrypted backups in your own Google Drive. Everything below explains
+    exactly what is stored and why.
+  </div>
+
+  <section>
+    <h2><span class="dot"></span>What's stored, and where</h2>
+    <p>Your photos, videos, folders, captions, and your password are saved only in this
+      browser's local storage (IndexedDB), tied to this app on this device. Nothing leaves your device unless you connect Google Drive backup, and no V Vault server receives your photos, videos or backups.</p>
+  </section>
+
+  <section>
+    <h2><span class="dot"></span>Sign-in and your Google account</h2>
+    <p>You can sign in with Google, or verify your Gmail address with a one-time code sent
+      by email. When you use "Continue with Google", the app reads your Google account's
+      email address and name to verify you, and asks permission to store backup files in
+      your Google Drive. The email address is kept on your device with your vault settings.</p>
+    <p>V Vault only requests the Google Drive permission that limits access to files the app
+      itself creates (the backup files). It cannot see the rest of your Drive. You can
+      disconnect at any time from the Backup screen, or remove V Vault's access in your
+      Google Account settings.</p>
+    <p>If you choose the email-code option, your email address is sent to an email delivery
+      service (EmailJS) once, only to deliver the code.</p>
+  </section>
+
+  <section>
+    <h2><span class="dot"></span>One active phone per account</h2>
+    <p>When you sign in with Google, V Vault can check which phone is currently signed in to
+      that Google account, so that a second phone has to be approved by the first (like a
+      "new device" prompt). For this a small account server (hosted on Cloudflare) stores,
+      per Google account: your email address, a random ID of the active phone, a one-way
+      hash of that phone's session secret, the time it was last active, and short-lived
+      sign-in requests (the name of the requesting device, e.g. "Android phone").</p>
+    <p>Your Google access token is sent to that server once per sign-in only to ask Google
+      whose account it is, and is never stored or logged. The server never receives your
+      photos, videos, vault password or backups. Signing out frees the account
+      immediately, and an account that has been inactive for a long time is freed
+      automatically.</p>
+  </section>
+
+  <section>
+    <h2><span class="dot"></span>Your password</h2>
+    <p>Your password is never stored as plain text. It's hashed using PBKDF2 (SHA-256,
+      150,000 iterations) with a random per-vault salt — only that hash and salt are
+      saved. A forgotten password can be reset via your security question, entirely
+      offline.</p>
+  </section>
+
+  <section>
+    <h2><span class="dot"></span>Backups</h2>
+    <p>A backup file bundles your photos, albums, and captions as JSON, then encrypts
+      the whole thing with AES-256-GCM using a key derived from your vault password.
+      Your password itself is never written into the backup file.</p>
+    <p>Backups are saved to your own Google Drive account (the one you signed in with), in
+      a folder created by the app, or to your device. Backups are encrypted before they
+      leave your device, so Google only stores an unreadable file. Older backups beyond the
+      most recent few are removed from that folder automatically. The developer never
+      receives your backups.</p>
+  </section>
+
+  <section>
+    <h2><span class="dot"></span>Privacy blur</h2>
+    <p>Vault content blurs instantly when the app loses focus, so nothing sensitive is
+      visible in the app switcher or to someone glancing over your shoulder. This is a
+      browser-level deterrent, not an OS-level screenshot block — a determined user
+      could still capture the unlocked screen.</p>
+  </section>
+
+  <section>
+    <h2><span class="dot"></span>Limits to be aware of</h2>
+    <ul>
+      <li>Photos are <strong style="color:var(--text)">not</strong> encrypted at rest in local storage — only backup files are encrypted.</li>
+      <li>Someone with direct access to your device's browser profile could potentially recover unencrypted content.</li>
+      <li>Clearing your browser's site data for this app permanently deletes your vault, unless you've made a backup first.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><span class="dot"></span>Changes to this policy</h2>
+    <p>Since this app has no server and no update-delivery mechanism beyond the app
+      itself, any change to how data is handled would ship as a new version of the app,
+      with this page updated to match.</p>
+  </section>
+</main>
+
+<footer>
+  V Vault is offline-first. This page describes the app's current behavior and is not a
+  substitute for reviewing the source code yourself.
+</footer>
+
+</body>
+</html>
