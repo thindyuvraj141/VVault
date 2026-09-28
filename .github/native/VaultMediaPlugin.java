@@ -463,4 +463,86 @@ public class VaultMediaPlugin extends Plugin {
 
         int deletedDirectly = 0;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && Environment.isExternalStorageManager()) {
-            // "All files access" is on: no confirmation dialog needed, 
+            // "All files access" is on: no confirmation dialog needed, delete directly.
+            java.util.List<Uri> remaining = new java.util.ArrayList<>();
+            for (Uri u : uris) {
+                try {
+                    if (getContext().getContentResolver().delete(u, null, null) > 0) {
+                        deletedDirectly++;
+                        continue;
+                    }
+                } catch (Exception e) {
+                    // fall back to the system dialog for this one
+                }
+                remaining.add(u);
+            }
+            uris = remaining;
+            if (uris.isEmpty()) {
+                JSObject done = new JSObject();
+                done.put("deleted", deletedDirectly);
+                call.resolve(done);
+                return;
+            }
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // Android 11+: one system confirmation dialog covers every file
+            // in the batch. The user taps "Allow" once; there is no way to
+            // skip this dialog — it's an OS privacy requirement, not
+            // something this plugin can bypass.
+            //
+            // We launch this the plain Android way (Activity.startIntentSenderForResult)
+            // and catch the result in handleOnActivityResult below, rather than
+            // relying on a newer Capacitor Plugin helper method that may not
+            // exist in every Capacitor version.
+            try {
+                PendingIntent pendingIntent =
+                        MediaStore.createDeleteRequest(getContext().getContentResolver(), uris);
+                call.setKeepAlive(true);
+                bridge.saveCall(call);
+                pendingDeleteCallbackId = call.getCallbackId();
+                pendingDeleteCount = uris.size() + deletedDirectly;
+                getActivity().startIntentSenderForResult(
+                        pendingIntent.getIntentSender(), DELETE_REQUEST_CODE,
+                        null, 0, 0, 0
+                );
+            } catch (Exception e) {
+                call.reject("Could not request delete", e);
+            }
+        } else {
+            // Android 10 and below: try a direct delete per file. This only
+            // succeeds for files the app itself owns, or where the user has
+            // already granted broad storage access — otherwise it silently
+            // fails, which is fine since the vault copy already exists.
+            int deleted = 0;
+            for (Uri uri : uris) {
+                try {
+                    if (getContext().getContentResolver().delete(uri, null, null) > 0) deleted++;
+                } catch (Exception e) {
+                    // e.g. RecoverableSecurityException — skip this file.
+                }
+            }
+            JSObject ret = new JSObject();
+            ret.put("deleted", deleted);
+            call.resolve(ret);
+        }
+    }
+
+    @Override
+    protected void handleOnActivityResult(int requestCode, int resultCode, Intent data) {
+        super.handleOnActivityResult(requestCode, resultCode, data);
+        if (requestCode == AUTH_REQUEST_CODE) {
+            handleAuthResult(resultCode, data);
+            return;
+        }
+        if (requestCode != DELETE_REQUEST_CODE || pendingDeleteCallbackId == null) return;
+        PluginCall savedCall = bridge.getSavedCall(pendingDeleteCallbackId);
+        pendingDeleteCallbackId = null;
+        if (savedCall == null) return;
+        JSObject ret = new JSObject();
+        // RESULT_OK means the user approved the whole batch.
+        ret.put("deleted", resultCode == Activity.RESULT_OK ? pendingDeleteCount : 0);
+        savedCall.resolve(ret);
+        bridge.releaseCall(savedCall);
+    }
+}
