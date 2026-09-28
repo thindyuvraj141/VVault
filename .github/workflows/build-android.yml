@@ -1,15 +1,8 @@
 name: Build Native Android App (Capacitor)
 
 on:
+  # Manual only: build runs when you press "Run workflow" in the Actions tab
   workflow_dispatch:
-  # Build automatically whenever the app files change (no need to press Run workflow)
-  push:
-    branches: [main, master]
-    paths:
-      - 'index.html'
-      - 'vault.html'
-      - 'VERSION'
-      - '.github/native/**'
 
 # never run two builds at the same time (they share the signing key cache)
 concurrency:
@@ -244,6 +237,17 @@ jobs:
             -storepass "${{ secrets.KEYSTORE_PASSWORD }}" \
             -keypass "${{ secrets.KEY_PASSWORD }}" \
             -dname "CN=V Vault, OU=App, O=VVault, C=IN"
+
+      - name: Print keystore SHA-1 (for Google OAuth Android client setup)
+        run: |
+          echo "=================================================="
+          echo " Copy the SHA1 line below into Google Cloud Console"
+          echo "=================================================="
+          keytool -list -v \
+            -keystore keystore-cache/vvault-release.jks \
+            -alias "${{ secrets.KEY_ALIAS }}" \
+            -storepass "${{ secrets.KEYSTORE_PASSWORD }}" \
+            | grep "SHA1:"
 
       - name: Build release APK
         run: |
