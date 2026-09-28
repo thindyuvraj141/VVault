@@ -132,6 +132,14 @@ jobs:
           sed "s/__APP_ID__/$APP_ID/" .github/native/VaultMediaPlugin.java > "$PKG_DIR/VaultMediaPlugin.java"
           sed "s/__APP_ID__/$APP_ID/" .github/native/MainActivity.java > "$PKG_DIR/MainActivity.java"
 
+      - name: Add Google Play services auth (silent Google Drive login)
+        run: |
+          GRADLE="android/app/build.gradle"
+          if ! grep -q "play-services-auth" "$GRADLE"; then
+            sed -i '/^dependencies {/a\    implementation "com.google.android.gms:play-services-auth:21.2.0"' "$GRADLE"
+          fi
+          grep -n "play-services-auth" "$GRADLE"
+
       - name: Add Share-to-app intent filters (share photos/videos into V Vault)
         run: |
           MANIFEST="android/app/src/main/AndroidManifest.xml"
