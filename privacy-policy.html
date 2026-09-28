@@ -138,16 +138,46 @@
   <p class="updated">Last updated: September 2026</p>
 
   <div class="intro">
-    <strong>V Vault does not collect, transmit, or share any of your data.</strong>
-    There is no account, no server, and no analytics. Everything below explains exactly
-    what stays on your device, and why.
+    <strong>V Vault does not upload, collect, or share your photos or videos.</strong>
+    No server ever receives your photos, videos or backups, and there are no analytics. Your vault stays on your device. The only
+    account involved is your own Google account, used to verify your email and, if you
+    choose, to store encrypted backups in your own Google Drive. Everything below explains
+    exactly what is stored and why.
   </div>
 
   <section>
     <h2><span class="dot"></span>What's stored, and where</h2>
     <p>Your photos, videos, folders, captions, and your password are saved only in this
-      browser's local storage (IndexedDB), tied to this app on this device. Nothing is
-      uploaded anywhere automatically, and there is no backend server this app talks to.</p>
+      browser's local storage (IndexedDB), tied to this app on this device. Nothing leaves your device unless you connect Google Drive backup, and no V Vault server receives your photos, videos or backups.</p>
+  </section>
+
+  <section>
+    <h2><span class="dot"></span>Sign-in and your Google account</h2>
+    <p>You can sign in with Google, or verify your Gmail address with a one-time code sent
+      by email. When you use "Continue with Google", the app reads your Google account's
+      email address and name to verify you, and asks permission to store backup files in
+      your Google Drive. The email address is kept on your device with your vault settings.</p>
+    <p>V Vault only requests the Google Drive permission that limits access to files the app
+      itself creates (the backup files). It cannot see the rest of your Drive. You can
+      disconnect at any time from the Backup screen, or remove V Vault's access in your
+      Google Account settings.</p>
+    <p>If you choose the email-code option, your email address is sent to an email delivery
+      service (EmailJS) once, only to deliver the code.</p>
+  </section>
+
+  <section>
+    <h2><span class="dot"></span>One active phone per account</h2>
+    <p>When you sign in with Google, V Vault can check which phone is currently signed in to
+      that Google account, so that a second phone has to be approved by the first (like a
+      "new device" prompt). For this a small account server (hosted on Cloudflare) stores,
+      per Google account: your email address, a random ID of the active phone, a one-way
+      hash of that phone's session secret, the time it was last active, and short-lived
+      sign-in requests (the name of the requesting device, e.g. "Android phone").</p>
+    <p>Your Google access token is sent to that server once per sign-in only to ask Google
+      whose account it is, and is never stored or logged. The server never receives your
+      photos, videos, vault password or backups. Signing out frees the account
+      immediately, and an account that has been inactive for a long time is freed
+      automatically.</p>
   </section>
 
   <section>
@@ -163,8 +193,11 @@
     <p>A backup file bundles your photos, albums, and captions as JSON, then encrypts
       the whole thing with AES-256-GCM using a key derived from your vault password.
       Your password itself is never written into the backup file.</p>
-    <p>You choose where a backup is saved — your device, or a cloud drive you connect
-      yourself. The app never uploads a backup anywhere on its own.</p>
+    <p>Backups are saved to your own Google Drive account (the one you signed in with), in
+      a folder created by the app, or to your device. Backups are encrypted before they
+      leave your device, so Google only stores an unreadable file. Older backups beyond the
+      most recent few are removed from that folder automatically. The developer never
+      receives your backups.</p>
   </section>
 
   <section>
