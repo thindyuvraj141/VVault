@@ -5907,6 +5907,15 @@ checkForSharedMedia();
         return true;
       }).catch(() => false);
     }
+    // Inside the Android app, only the native plugin above is allowed to renew
+    // silently. Falling back to the browser-based flow here would pop open a
+    // visible sign-in page in the background every time a renewal is due —
+    // exactly the repeated "Google Drive login page" this is meant to avoid.
+    // If the native plugin isn't available, fail quietly; the next explicit
+    // "Sign in with Google" tap will handle it properly.
+    if(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()){
+      return Promise.resolve(false);
+    }
     return new Promise((resolve) => {
       if(typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2){ resolve(false); return; }
       try{
