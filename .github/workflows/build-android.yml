@@ -246,16 +246,16 @@ jobs:
             -keypass "${{ secrets.KEY_PASSWORD }}" \
             -dname "CN=V Vault, OU=App, O=VVault, C=IN"
 
-      - name: Print keystore SHA-1 (for Google OAuth Android client setup)
+      - name: Print keystore SHA-1 and SHA-256
         run: |
           echo "=================================================="
-          echo " Copy the SHA1 line below into Google Cloud Console"
+          echo " Copy the SHA1 and SHA256 lines below"
           echo "=================================================="
           keytool -list -v \
             -keystore keystore-cache/vvault-release.jks \
             -alias "${{ secrets.KEY_ALIAS }}" \
             -storepass "${{ secrets.KEYSTORE_PASSWORD }}" \
-            | grep "SHA1:"
+            | grep -E "SHA1:|SHA256:"
 
       - name: Build release APK
         run: |
@@ -292,3 +292,4 @@ jobs:
           name: V Vault ${{ steps.ver.outputs.tag }}
           files: release-out/vvault-${{ steps.ver.outputs.tag }}.apk
           make_latest: true
+          
