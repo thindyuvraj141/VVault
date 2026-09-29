@@ -56,7 +56,8 @@ import java.util.List;
  * delete another app's media. That's why this needs to be native code
  * instead of something addable to the HTML file directly.
  *
- * It also provides getAccessToken() for Google Drive backup (see below).
+ * It also provides getAccessToken() to identify the signed-in Google
+ * account for cloud backup (see below) — no Drive access is requested.
  */
 // requestCodes MUST list every startIntentSenderForResult code used below
 // (9821 = DELETE_REQUEST_CODE, 9932 = AUTH_REQUEST_CODE), otherwise Capacitor
@@ -75,12 +76,13 @@ import java.util.List;
 )
 public class VaultMediaPlugin extends Plugin {
 
-    /* ---------------- Google Drive: silent access token ----------------
+    /* ---------------- Google identity: silent access token ----------------
        Uses Google's Authorization API (what native apps like WhatsApp use).
        The first call shows Google's consent screen once. After that every
-       call returns a fresh access token with NO screen, so the Drive login
-       never expires from the user's point of view. The app is identified to
-       Google by its package name + signing SHA-1 (the "Android" OAuth client).
+       call returns a fresh access token with NO screen, so sign-in stays
+       effectively permanent. The app is identified to Google by its package
+       name + signing SHA-1 (the "Android" OAuth client). Only identity
+       scopes (email, profile) are requested — no Google Drive access.
 
        JS: VaultMedia.getAccessToken({ interactive: true | false })
        interactive=false rejects with "needs_consent" instead of showing UI. */
@@ -91,8 +93,9 @@ public class VaultMediaPlugin extends Plugin {
     public void getAccessToken(final PluginCall call) {
         final boolean interactive = Boolean.TRUE.equals(call.getBoolean("interactive", false));
 
+        // Only identity scopes — the app no longer requests any Google Drive
+        // access; backups go to V Vault's own cloud storage instead.
         List<Scope> scopes = new ArrayList<>();
-        scopes.add(new Scope("https://www.googleapis.com/auth/drive.file"));
         scopes.add(new Scope("email"));
         scopes.add(new Scope("profile"));
 
