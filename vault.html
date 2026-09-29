@@ -272,18 +272,18 @@
   .vault-header .icon-btn{color:var(--wa-header-text);}
   .vault-header .icon-btn:hover{background:rgba(255,255,255,0.12);color:var(--wa-header-text);}
 
-  /* Google Drive backup header button */
-  .gdrive-header-btn{
+  /* Cloud backup header button */
+  .cloud-header-btn{
     background:rgba(255,255,255,0.94);
     box-shadow:0 2px 6px rgba(0,0,0,0.18);
     transition:transform .15s ease, box-shadow .15s ease;
   }
-  .gdrive-header-btn:hover{
+  .cloud-header-btn:hover{
     background:#ffffff;
     transform:scale(1.07);
     box-shadow:0 3px 10px rgba(0,0,0,0.25);
   }
-  .gdrive-header-btn:active{transform:scale(0.95);}
+  .cloud-header-btn:active{transform:scale(0.95);}
 
   .trash-header-btn{
     background:rgba(255,255,255,0.94);
@@ -303,7 +303,7 @@
   .or-divider{display:flex;align-items:center;gap:10px;margin:14px 0 6px;color:var(--text-faint);font-size:12px;}
   .or-divider::before,.or-divider::after{content:"";flex:1;height:1px;background:var(--border);}
   /* while the decoy vault is open, hide anything that could reveal or touch the real vault */
-  body.decoy-mode .decoy-hide, body.decoy-mode #header-gdrive-btn{display:none !important;}
+  body.decoy-mode .decoy-hide, body.decoy-mode #header-cloud-btn{display:none !important;}
 
   .menu-header-btn{
     background:rgba(255,255,255,0.94);
@@ -1066,17 +1066,17 @@
           <div class="icon-btn trash-header-btn">🗑️</div>
           <span class="header-icon-label">Trash</span>
         </div>
-        <div class="header-icon-group" onclick="openAutoBackupModal();" title="Google Drive Backup" id="header-gdrive-btn">
-          <div class="icon-btn gdrive-header-btn">
+        <div class="header-icon-group" onclick="openAutoBackupModal();" title="Cloud Backup" id="header-cloud-btn">
+          <div class="icon-btn cloud-header-btn">
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
               <defs>
-                <linearGradient id="gdriveGrad" x1="2" y1="3" x2="16" y2="15" gradientUnits="userSpaceOnUse">
+                <linearGradient id="cloudGrad" x1="2" y1="3" x2="16" y2="15" gradientUnits="userSpaceOnUse">
                   <stop offset="0" stop-color="#4A90D9"/>
                   <stop offset="1" stop-color="#25D366"/>
                 </linearGradient>
               </defs>
-              <path d="M5.4 12.3a3.1 3.1 0 0 1-.5-6.16A4 4 0 0 1 12.7 5.4a3 3 0 0 1-.5 5.9" stroke="url(#gdriveGrad)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M9 12.8V7.6M9 7.6l-2.1 2.1M9 7.6l2.1 2.1" stroke="url(#gdriveGrad)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M5.4 12.3a3.1 3.1 0 0 1-.5-6.16A4 4 0 0 1 12.7 5.4a3 3 0 0 1-.5 5.9" stroke="url(#cloudGrad)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M9 12.8V7.6M9 7.6l-2.1 2.1M9 7.6l2.1 2.1" stroke="url(#cloudGrad)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
           <span class="header-icon-label">Backup</span>
@@ -1128,7 +1128,7 @@
         <span id="backup-reminder-text" style="font-size:11.5px;opacity:0.88;">Last backup: Never</span>
       </div>
       <div style="display:flex;gap:6px;">
-        <button class="update-banner-btn" onclick="gdriveBackupNow()">Backup now</button>
+        <button class="update-banner-btn" onclick="cloudBackupNow()">Backup now</button>
         <button class="update-banner-dismiss" onclick="dismissBackupReminder()">✕</button>
       </div>
     </div>
@@ -1715,45 +1715,26 @@
   </div>
 
   <!-- ===== AUTO BACKUP MODAL (WhatsApp-style) ===== -->
-  <!-- ===== GOOGLE DRIVE BACKUP MODAL ===== -->
+  <!-- ===== CLOUD BACKUP MODAL ===== -->
   <div class="modal-overlay" id="auto-backup-overlay">
     <div class="modal-card" style="max-height:92vh;overflow-y:auto;padding-bottom:8px;">
 
       <h3 style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
-        <!-- Google Drive colour icon -->
-        <svg width="22" height="20" viewBox="0 0 87.3 78" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
-          <path d="M6.6 66.85 3.8 72.2c-.6 1.1.2 2.4 1.4 2.4h29.3l3.8-7.75z" fill="#0066DA"/>
-          <path d="M44.6 66.85h29.4l3.8 7.75H48.4z" fill="#00AC47"/>
-          <path d="M44.6 66.85 34.5 74.6h18.3l-8.2-7.75z" fill="#EA4335" opacity=".5"/>
-          <path d="M29.8 66.85 22 52.75 5.3 66.85z" fill="#00832D"/>
-          <path d="m57.5 66.85 7.8-14.1 16.7 14.1z" fill="#2684FC"/>
-          <path d="M29.8 66.85 44.6 39.3 59.4 66.85z" fill="#00AC47"/>
-          <path d="M3.8 72.2c-.2.3-.3.7-.3 1 0 1.2 1 2.2 2.2 2.2h28.8l-3.8-7.75H5.2L3.8 72.2z" fill="#0066DA" opacity=".3"/>
-          <path d="M44.6 39.3 29.8 66.85h29.6z" fill="#00832D" opacity=".3"/>
-          <path d="M81.8 72.2c.2.3.3.7.3 1 0 1.2-1 2.2-2.2 2.2H50.8l3.8-7.75h17.5L81.8 72.2z" fill="#2684FC" opacity=".3"/>
-          <path d="M44.6 3.15 59.4 29.7H29.8z" fill="#EA4335"/>
-          <path d="M44.6 3.15 29.8 29.7H3.5L29.8 3.15z" fill="#FFBA00"/>
-          <path d="M44.6 3.15 59.4 29.7H85.8L59.4 3.15z" fill="#00832D"/>
-          <path d="M3.5 29.7 22 52.75 29.8 29.7z" fill="#FFBA00" opacity=".5"/>
-          <path d="M85.8 29.7 65.3 52.75 59.4 29.7z" fill="#00832D" opacity=".5"/>
-          <path d="M22 52.75 29.8 29.7H59.4l7.8 23.05z" fill="#FFBA00"/>
-          <path d="M29.8 29.7H3.5l18.5 23.05z" fill="#FF6D00" opacity=".4"/>
-          <path d="M59.4 29.7h26.4L67.2 52.75z" fill="#009D57" opacity=".4"/>
-        </svg>
-        Google Drive Backup
+        <svg width="20" height="20" viewBox="0 0 18 18" fill="none" style="flex-shrink:0;color:var(--accent);"><path d="M5.4 12.3a3.1 3.1 0 0 1-.5-6.16A4 4 0 0 1 12.7 5.4a3 3 0 0 1-.5 5.9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 12.8V7.6M9 7.6l-2.1 2.1M9 7.6l2.1 2.1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Cloud Backup
       </h3>
 
       <!-- SIGNED OUT STATE -->
-      <div id="gdrive-signed-out">
+      <div id="cloud-signed-out">
         <div style="text-align:center;padding:8px 0 16px;">
           <div style="width:56px;height:56px;border-radius:50%;background:var(--bg-elevated);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
             <svg width="26" height="26" viewBox="0 0 18 18" fill="none"><path d="M9 2a4 4 0 1 1 0 8 4 4 0 0 1 0-8zm0 10c4.4 0 7 2 7 3v1H2v-1c0-1 2.6-3 7-3z" stroke="var(--text-muted)" stroke-width="1.3" stroke-linejoin="round"/></svg>
           </div>
           <div style="font-size:14px;font-weight:500;margin-bottom:6px;">Sign in with Google</div>
           <div style="font-size:12.5px;color:var(--text-muted);line-height:1.6;margin-bottom:16px;">
-            Your vault backs up automatically to your Google Drive — just like WhatsApp. Only you can see your data.
+            Your vault backs up automatically to secure cloud storage, tied to your Google account. Only you can see your data.
           </div>
-          <button onclick="gdriveSignIn()" id="gdrive-signin-btn" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:12px;background:var(--card);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-size:14px;font-weight:500;color:var(--text);">
+          <button onclick="cloudSignIn()" id="cloud-signin-btn" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:12px;background:var(--card);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-size:14px;font-weight:500;color:var(--text);">
             <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.4 1.2 8.7 3.2l6.5-6.5C35.2 2.7 30 .5 24 .5 14.7.5 6.7 6 2.9 13.9l7.6 5.9C12.4 13.8 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.3-4 6.1-9.9 6.1-17z"/><path fill="#FBBC05" d="M10.5 28.5A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.1.7-4.5L2.6 13.6A23.5 23.5 0 0 0 .5 24c0 3.8.9 7.3 2.4 10.5z"/><path fill="#34A853" d="M24 47.5c6 0 11-2 14.7-5.5l-7.5-5.8c-2 1.4-4.5 2.3-7.2 2.3-6.3 0-11.6-4.3-13.5-10.1l-7.6 5.9C6.8 42 14.8 47.5 24 47.5z"/></svg>
             Sign in with Google
           </button>
@@ -1761,30 +1742,30 @@
 
         <div style="padding:12px;background:var(--bg-elevated);border-radius:10px;margin-top:4px;">
           <div style="font-size:11.5px;color:var(--text-muted);line-height:1.6;">
-            🔒 Your vault stays encrypted. Google only sees an encrypted file — only you know what's inside.
+            🔒 Your vault stays encrypted before it ever leaves your device. The server only ever sees an unreadable file — nobody but you can open it.
           </div>
         </div>
       </div>
 
       <!-- SIGNED IN STATE -->
-      <div id="gdrive-signed-in" style="display:none;">
+      <div id="cloud-signed-in" style="display:none;">
 
         <!-- Account card -->
         <div style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg-elevated);border-radius:10px;margin-bottom:14px;">
-          <img id="gdrive-user-avatar" src="" width="36" height="36" style="border-radius:50%;display:none;" alt="">
-          <div id="gdrive-user-initials" style="width:36px;height:36px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:var(--accent);flex-shrink:0;"></div>
+          <img id="cloud-user-avatar" src="" width="36" height="36" style="border-radius:50%;display:none;" alt="">
+          <div id="cloud-user-initials" style="width:36px;height:36px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:var(--accent);flex-shrink:0;"></div>
           <div style="flex:1;min-width:0;">
-            <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="gdrive-user-name">—</div>
-            <div style="font-size:11.5px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="gdrive-user-email">—</div>
+            <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="cloud-user-name">—</div>
+            <div style="font-size:11.5px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="cloud-user-email">—</div>
           </div>
-          <button onclick="gdriveSignOut()" style="font-size:11.5px;color:var(--text-muted);background:none;border:0.5px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;">Sign out</button>
+          <button onclick="cloudSignOut()" style="font-size:11.5px;color:var(--text-muted);background:none;border:0.5px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;">Sign out</button>
         </div>
 
         <!-- Auto backup toggle -->
         <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
           <div>
             <div style="font-size:14px;font-weight:500;">Back up automatically</div>
-            <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Save to Google Drive</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Save to cloud backup</div>
           </div>
           <div class="toggle-switch" id="auto-backup-toggle" onclick="toggleAutoBackup()"><div class="toggle-knob"></div></div>
         </div>
@@ -1827,24 +1808,20 @@
               <svg width="14" height="14" viewBox="0 0 18 18" fill="none"><path d="M9 2v4M9 12v4M2 9h4M12 9h4" stroke="var(--text-muted)" stroke-width="1.4" stroke-linecap="round"/></svg>
               <span style="font-size:13px;color:var(--text-muted);" id="ab-next-backup-label">Next: —</span>
             </div>
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+            <div style="display:flex;align-items:center;gap:8px;">
               <svg width="14" height="14" viewBox="0 0 18 18" fill="none"><rect x="3" y="7" width="12" height="8" rx="1.5" stroke="var(--text-muted)" stroke-width="1.4"/><path d="M6 7V5a3 3 0 0 1 6 0v2" stroke="var(--text-muted)" stroke-width="1.4"/></svg>
               <span style="font-size:13px;color:var(--text-muted);" id="ab-backup-size-label">No backup yet</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <svg width="14" height="14" viewBox="0 0 87.3 78" fill="none"><path d="M6.6 66.85 3.8 72.2c-.6 1.1.2 2.4 1.4 2.4h29.3l3.8-7.75z" fill="#0066DA"/><path d="M44.6 66.85h29.4l3.8 7.75H48.4z" fill="#00AC47"/><path d="M29.8 66.85 22 52.75 5.3 66.85z" fill="#00832D"/><path d="m57.5 66.85 7.8-14.1 16.7 14.1z" fill="#2684FC"/><path d="M29.8 66.85 44.6 39.3 59.4 66.85z" fill="#00AC47"/><path d="M44.6 39.3 29.8 66.85h29.6z" fill="#00832D" opacity=".3"/><path d="M44.6 3.15 59.4 29.7H29.8z" fill="#EA4335"/><path d="M44.6 3.15 29.8 29.7H3.5L29.8 3.15z" fill="#FFBA00"/><path d="M44.6 3.15 59.4 29.7H85.8L59.4 3.15z" fill="#00832D"/><path d="M22 52.75 29.8 29.7H59.4l7.8 23.05z" fill="#FFBA00"/></svg>
-              <span style="font-size:13px;color:var(--text-muted);" id="ab-drive-label">Drive folder: V Vault Backups</span>
             </div>
           </div>
         </div>
 
         <!-- Action buttons -->
         <div style="display:flex;gap:8px;margin-top:14px;">
-          <button class="btn btn-primary" style="flex:1;" onclick="gdriveBackupNow()" id="gdrive-backup-now-btn">
+          <button class="btn btn-primary" style="flex:1;" onclick="cloudBackupNow()" id="cloud-backup-now-btn">
             <svg width="14" height="14" viewBox="0 0 18 18" fill="none" style="margin-right:5px;vertical-align:-1px;"><path d="M9 2V10M9 10L5.5 6.5M9 10L12.5 6.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 13V15.5H15V13" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
             Back up now
           </button>
-          <button class="btn btn-ghost" style="flex:1;" onclick="gdriveRestorePrompt()">
+          <button class="btn btn-ghost" style="flex:1;" onclick="cloudRestorePrompt()">
             <svg width="14" height="14" viewBox="0 0 18 18" fill="none" style="margin-right:5px;vertical-align:-1px;"><path d="M9 16V8M9 8L5.5 11.5M9 8L12.5 11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 5V2.5H15V5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
             Restore
           </button>
@@ -1857,15 +1834,15 @@
     </div>
   </div>
 
-  <!-- Google Drive Restore picker modal -->
-  <div class="modal-overlay" id="gdrive-restore-overlay">
+  <!-- Cloud Backup Restore picker modal -->
+  <div class="modal-overlay" id="cloud-restore-overlay">
     <div class="modal-card">
-      <h3>Restore from Drive</h3>
-      <div id="gdrive-restore-list" style="max-height:260px;overflow-y:auto;">
+      <h3>Restore backup</h3>
+      <div id="cloud-restore-list" style="max-height:260px;overflow-y:auto;">
         <div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">Loading backups…</div>
       </div>
       <div class="modal-actions">
-        <button class="btn btn-ghost" onclick="closeGdriveRestoreModal()">Cancel</button>
+        <button class="btn btn-ghost" onclick="closeCloudRestoreModal()">Cancel</button>
       </div>
     </div>
   </div>
@@ -2318,13 +2295,13 @@ async function seatRespond(approve){
 }
 
 /* This phone is no longer the account's active phone. The vault stays fully
-   usable (it lives on this phone); only account features (Drive backup) stop. */
+   usable (it lives on this phone); only account features (cloud backup) stop. */
 function seatRevoked(message){
   stopSeatHeartbeat();
   seatSave(null);
   seatCurrentReq = null;
   document.getElementById('seat-approve-overlay').classList.remove('active');
-  if(window.gdriveSignOut) window.gdriveSignOut(true);
+  if(window.cloudSignOut) window.cloudSignOut(true);
   showToast(message, 7000);
 }
 
@@ -2343,21 +2320,21 @@ if(seatEnabled() && seatLoad()) setTimeout(startSeatHeartbeat, 1500);
    and connects Drive backup, so login and backup are the same account. */
 function googleLoginContinue(){
   clearError('gmail');
-  if(typeof window.gdriveSignInForLogin !== 'function'){
+  if(typeof window.cloudSignInForLogin !== 'function'){
     setError('gmail','Google sign-in is still loading. Try again in a moment, or use the email code below.');
     return;
   }
-  window.gdriveSignInForLogin(async (user) => {
+  window.cloudSignInForLogin(async (user) => {
     const email = ((user && user.email) || '').trim().toLowerCase();
     if(!email){
       setError('gmail','Could not read your Google account. Please use the email code option below.');
-      if(window.gdriveSignOut) window.gdriveSignOut(true);
+      if(window.cloudSignOut) window.cloudSignOut(true);
       return;
     }
-    const seat = await seatLoginFlow(email, window.gdriveGetToken && window.gdriveGetToken());
+    const seat = await seatLoginFlow(email, window.cloudGetToken && window.cloudGetToken());
     if(!seat.ok){
       setError('gmail', seat.reason || 'Sign-in was not approved.');
-      if(window.gdriveSignOut) window.gdriveSignOut(true);
+      if(window.cloudSignOut) window.cloudSignOut(true);
       return;
     }
     vault.gmailEmail = email;
@@ -4866,7 +4843,7 @@ function notifyBackupComplete(count, sizeLabel){
   try{
     if('Notification' in window && Notification.permission === 'granted'){
       new Notification('V Vault backed up', {
-        body: count + (count === 1 ? ' photo' : ' photos') + ' backed up to Google Drive (' + sizeLabel + ')',
+        body: count + (count === 1 ? ' photo' : ' photos') + ' backed up (' + sizeLabel + ')',
         icon: 'icon-192.png',
         silent: true
       });
@@ -4975,11 +4952,11 @@ function checkAutoBackupDue(){
   }
   // Overdue: if the vault is unlocked and signed in to Drive, back up silently
   // (no re-prompt) — same idea as WhatsApp's silent background backup.
-  if(typeof window.gdriveIsSignedIn === 'function' && window.gdriveIsSignedIn() && sessionAuthSecret && !autoBackupSettings.retryScheduled){
+  if(typeof window.cloudIsSignedIn === 'function' && window.cloudIsSignedIn() && sessionAuthSecret && !autoBackupSettings.retryScheduled){
     const onWifi = isOnWifi();
     if(!autoBackupSettings.wifiOnly || onWifi){
-      window.performGdriveBackup(sessionAuthSecret, { silent:true });
-      return; // performGdriveBackup hides the banner itself once it finishes
+      window.performCloudBackup(sessionAuthSecret, { silent:true });
+      return; // performCloudBackup hides the banner itself once it finishes
     }
   }
   if(!banner) return;
@@ -5446,30 +5423,27 @@ bootFromStorage();
 checkForSharedMedia();
 </script>
 
-<!-- ===== GOOGLE DRIVE BACKUP SYSTEM ===== -->
-<!-- 
-  SETUP (one-time):
-  1. Go to https://console.cloud.google.com
-  2. Create a new project → "V Vault"
-  3. APIs & Services → Enable: "Google Drive API" + "Google Identity Services"
-  4. Credentials → Create OAuth 2.0 Client ID (Web application)
-  5. Add your website's URL under Authorized JavaScript origins
-  6. Put your ID in CLIENT_ID below
+<!-- ===== CLOUD BACKUP SYSTEM (Cloudflare Worker + R2) ===== -->
+<!--
+  SETUP (one-time): see SETUP-server.md. In short:
+  1. Deploy worker.js to Cloudflare Workers, bind a D1 database as `DB` and
+     an R2 bucket as `BUCKET`.
+  2. Put that Worker's URL in ACCOUNT_SERVER_URL above (account-seat section).
+  Google sign-in below is only used to verify who you are (your email) — it
+  no longer asks for any Google Drive access.
 -->
 <script>
 (function(){
-  /* ── CONFIG: put your Google OAuth Client ID here ── */
-  const GDRIVE_CLIENT_ID = '1067709214439-rcvj3gbbrv65j1t8gcn87dii8dcqa4fk.apps.googleusercontent.com';
-  const GDRIVE_SCOPES    = 'https://www.googleapis.com/auth/drive.file email profile';
-  const FOLDER_NAME      = 'V Vault Backups';
+  /* ── CONFIG: same Google OAuth Client ID used for sign-in ── */
+  const AUTH_CLIENT_ID = '1067709214439-rcvj3gbbrv65j1t8gcn87dii8dcqa4fk.apps.googleusercontent.com';
+  const AUTH_SCOPES     = 'email profile'; // no Drive access needed any more
 
   /* ── State ── */
-  let gdriveRenewalTimer = null; // declared up here so boot-time code can safely use it
-  let gdriveToken    = null;   // OAuth access token
-  let gdriveUser     = null;   // {name, email, picture}
-  let gdriveFolderId = null;   // cached Drive folder id
+  let authRenewalTimer = null; // declared up here so boot-time code can safely use it
+  let authToken = null;   // Google OAuth access token — used only to prove identity to our own server
+  let authUser  = null;   // {name, email, picture}
 
-  /* ── Load Google Identity Services ── */
+  /* ── Load Google Identity Services (only needed for the plain-browser fallback) ── */
   const gsiScript = document.createElement('script');
   gsiScript.src   = 'https://accounts.google.com/gsi/client';
   gsiScript.async = true;
@@ -5478,17 +5452,17 @@ checkForSharedMedia();
     // Only once GSI is actually ready — a saved-but-expired token means we
     // had a signed-in user whose access token lapsed while the app was
     // closed; try to renew it quietly instead of forcing a fresh sign-in.
-    if(!gdriveToken && gdriveUser && gdriveUser.email) silentGdriveRefresh();
+    if(!authToken && authUser && authUser.email) silentAuthRefresh();
   };
   document.head.appendChild(gsiScript);
 
   /* ── Restore saved session ── */
   try {
-    const saved = JSON.parse(localStorage.getItem('vvault_gdrive') || 'null');
-    if(saved && saved.user){ gdriveUser = saved.user; }
+    const saved = JSON.parse(localStorage.getItem('vvault_cloud') || 'null');
+    if(saved && saved.user){ authUser = saved.user; }
     if(saved && saved.token && saved.expiresAt && saved.expiresAt > Date.now()){
-      gdriveToken = saved.token;
-      scheduleGdriveTokenRenewal();
+      authToken = saved.token;
+      scheduleAuthRenewal();
     }
   } catch(e){}
 
@@ -5496,63 +5470,63 @@ checkForSharedMedia();
      Google script — renew straight away if we were signed in before. Also
      renew whenever the app comes back to the foreground with an expired or
      nearly-expired token, so opening it after hours or days just works. */
-  if(nativeAuthPlugin() && gdriveUser && gdriveUser.email && !gdriveToken){
-    silentGdriveRefresh();
+  if(nativeAuthPlugin() && authUser && authUser.email && !authToken){
+    silentAuthRefresh();
   }
   document.addEventListener('visibilitychange', () => {
     if(document.visibilityState !== 'visible') return;
-    if(!nativeAuthPlugin() || !gdriveUser || !gdriveUser.email) return;
+    if(!nativeAuthPlugin() || !authUser || !authUser.email) return;
     try{
-      const saved = JSON.parse(localStorage.getItem('vvault_gdrive') || 'null');
+      const saved = JSON.parse(localStorage.getItem('vvault_cloud') || 'null');
       const soon = !saved || !saved.expiresAt || saved.expiresAt - Date.now() < 2 * 60 * 1000;
-      if(!gdriveToken || soon) silentGdriveRefresh();
+      if(!authToken || soon) silentAuthRefresh();
     }catch(e){}
   });
 
   /* ── Public API ── */
-  const GDRIVE_REDIRECT_URI = 'https://vvaultweb.dpdns.org/google-callback.html';
+  const AUTH_REDIRECT_URI = 'https://vvaultweb.dpdns.org/google-callback.html';
 
   /* Shared "signed in" handler. When the login screen started this sign-in
-     (gdriveLoginCallback set) we hand the Google account back to it and skip
-     the normal Drive toast / restore prompt; otherwise it's a plain Drive
-     connect from the Backup screen. */
-  let gdriveLoginCallback = null;
-  function onGdriveSignedInSuccess(){
-    showGdriveSignedIn();
-    if(gdriveLoginCallback){
-      const cb = gdriveLoginCallback;
-      gdriveLoginCallback = null;
-      cb(gdriveUser);
+     (authLoginCallback set) we hand the Google account back to it and skip
+     the normal backup toast / restore prompt; otherwise it's a plain
+     "Sign in with Google" from the Backup screen. */
+  let authLoginCallback = null;
+  function onAuthSignedInSuccess(){
+    showCloudSignedIn();
+    if(authLoginCallback){
+      const cb = authLoginCallback;
+      authLoginCallback = null;
+      cb(authUser);
       return;
     }
-    // Plain Drive connect from the Backup screen: also claim / ask for the account seat.
+    // Plain sign-in from the Backup screen: also claim / ask for the account seat.
     (async () => {
-      const email = ((gdriveUser && gdriveUser.email) || '').toLowerCase();
-      const seat = await seatLoginFlow(email, gdriveToken);
+      const email = ((authUser && authUser.email) || '').toLowerCase();
+      const seat = await seatLoginFlow(email, authToken);
       if(!seat.ok){
-        window.gdriveSignOut(true);
+        window.cloudSignOut(true);
         showToast(seat.reason || 'Sign-in was not approved.', 5000);
         return;
       }
-      showToast('✓ Connected to Google Drive!');
-      checkForExistingBackupOnSignIn();
+      showToast('✓ Signed in!');
+      checkForExistingCloudBackupOnSignIn();
     })();
   }
-  window.gdriveGetToken = function(){ return gdriveToken; };
-  window.gdriveSignInForLogin = function(cb){ gdriveLoginCallback = cb; return gdriveSignInCore(); };
-  window.gdriveSignIn = function(){ gdriveLoginCallback = null; return gdriveSignInCore(); };
+  window.cloudGetToken = function(){ return authToken; };
+  window.cloudSignInForLogin = function(cb){ authLoginCallback = cb; return cloudSignInCore(); };
+  window.cloudSignIn = function(){ authLoginCallback = null; return cloudSignInCore(); };
 
-  async function gdriveSignInCore(){
-    /* ---- Android app with the native VaultAuth plugin: no browser, no expiry ---- */
+  async function cloudSignInCore(){
+    /* ---- Android app with the native VaultMedia plugin: no browser, no expiry ---- */
     if (nativeAuthPlugin()) {
       try{
         showToast('Connecting to Google, please wait…');
         const token = await nativeGetToken(true);
         if(token){
-          gdriveToken = token;
-          await fetchGdriveUserInfo();
-          saveGdriveSession(3500);
-          onGdriveSignedInSuccess();
+          authToken = token;
+          await fetchAuthUserInfo();
+          saveAuthSession(3500);
+          onAuthSignedInSuccess();
           return;
         }
       }catch(err){
@@ -5566,10 +5540,10 @@ checkForSharedMedia();
       const { Browser, App } = window.Capacitor.Plugins;
 
       const authUrl = 'https://accounts.google.com/o/oauth2/v2/auth'
-        + '?client_id=' + encodeURIComponent(GDRIVE_CLIENT_ID)
-        + '&redirect_uri=' + encodeURIComponent(GDRIVE_REDIRECT_URI)
+        + '?client_id=' + encodeURIComponent(AUTH_CLIENT_ID)
+        + '&redirect_uri=' + encodeURIComponent(AUTH_REDIRECT_URI)
         + '&response_type=token'
-        + '&scope=' + encodeURIComponent(GDRIVE_SCOPES)
+        + '&scope=' + encodeURIComponent(AUTH_SCOPES)
         + '&prompt=consent';
 
       const listener = App.addListener('appUrlOpen', async (data) => {
@@ -5581,10 +5555,10 @@ checkForSharedMedia();
         listener.remove();
         try { await Browser.close(); } catch(e){}
         if (token) {
-          gdriveToken = token;
-          await fetchGdriveUserInfo();
-          saveGdriveSession(expiresIn);
-          onGdriveSignedInSuccess();
+          authToken = token;
+          await fetchAuthUserInfo();
+          saveAuthSession(expiresIn);
+          onAuthSignedInSuccess();
         } else {
           showToast('Sign in cancelled');
         }
@@ -5598,80 +5572,79 @@ checkForSharedMedia();
     /* ---- Normal website: popup flow (unchanged) ---- */
     if(typeof google === 'undefined'){
       showToast('Connecting to Google, please wait…');
-      setTimeout(gdriveSignInCore, 1500);
+      setTimeout(cloudSignInCore, 1500);
       return;
     }
     const client = google.accounts.oauth2.initTokenClient({
-      client_id: GDRIVE_CLIENT_ID,
-      scope: GDRIVE_SCOPES,
+      client_id: AUTH_CLIENT_ID,
+      scope: AUTH_SCOPES,
       callback: async (resp) => {
         if(resp.error){ showToast('Sign in cancelled'); return; }
-        gdriveToken = resp.access_token;
-        await fetchGdriveUserInfo();
-        saveGdriveSession(resp.expires_in);
-        onGdriveSignedInSuccess();
+        authToken = resp.access_token;
+        await fetchAuthUserInfo();
+        saveAuthSession(resp.expires_in);
+        onAuthSignedInSuccess();
       }
     });
     client.requestAccessToken();
   };
 
-  window.gdriveSignOut = function(quiet){
+  window.cloudSignOut = function(quiet){
     seatLogoutBestEffort(); // free the account seat so the next phone needs no popup
-    if(gdriveToken && typeof google !== 'undefined' && google.accounts && google.accounts.oauth2){
-      try{ google.accounts.oauth2.revoke(gdriveToken); }catch(e){}
-    } else if(gdriveToken){
+    if(authToken && typeof google !== 'undefined' && google.accounts && google.accounts.oauth2){
+      try{ google.accounts.oauth2.revoke(authToken); }catch(e){}
+    } else if(authToken){
       try{
-        fetch('https://oauth2.googleapis.com/revoke?token=' + encodeURIComponent(gdriveToken),
+        fetch('https://oauth2.googleapis.com/revoke?token=' + encodeURIComponent(authToken),
           { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'} }).catch(()=>{});
       }catch(e){}
     }
-    gdriveToken    = null;
-    gdriveUser     = null;
-    gdriveFolderId = null;
-    if(gdriveRenewalTimer){ clearTimeout(gdriveRenewalTimer); gdriveRenewalTimer = null; }
+    authToken = null;
+    authUser  = null;
+    if(authRenewalTimer){ clearTimeout(authRenewalTimer); authRenewalTimer = null; }
     autoBackupSettings.enabled = false;
     saveAutoBackupSettings();
-    localStorage.removeItem('vvault_gdrive');
-    showGdriveSignedOut();
-    if(quiet !== true) showToast('Disconnected from Google Drive');
+    localStorage.removeItem('vvault_cloud');
+    showCloudSignedOut();
+    if(quiet !== true) showToast('Signed out');
   };
 
-  window.gdriveBackupNow = async function(){
+  window.cloudBackupNow = async function(){
     if(decoyModeActive) return;
-    if(!gdriveToken){ showToast('Please sign in with Google first'); return; }
-    const btn = document.getElementById('gdrive-backup-now-btn');
+    if(!authToken){ showToast('Please sign in with Google first'); return; }
+    const btn = document.getElementById('cloud-backup-now-btn');
     if(btn){ btn.disabled = true; btn.textContent = 'Backing up…'; }
     if(sessionAuthSecret){
       // vault is already unlocked this session — no need to ask for the
       // password again, same as WhatsApp never re-prompting mid-session
-      await performGdriveBackup(sessionAuthSecret);
+      await performCloudBackup(sessionAuthSecret);
       return;
     }
-    openBackupPwModalForGdrive();
+    openBackupPwModalForCloud();
   };
 
-  window.gdriveIsSignedIn = function(){ return !!gdriveToken; };
+  window.cloudIsSignedIn = function(){ return !!authToken; };
 
-  window.gdriveRestorePrompt = async function(){
+  window.cloudRestorePrompt = async function(){
     if(decoyModeActive) return;
-    if(!gdriveToken){ showToast('Please sign in with Google first'); return; }
-    document.getElementById('gdrive-restore-overlay').classList.add('active');
-    await loadGdriveBackupList();
+    if(!authToken){ showToast('Please sign in with Google first'); return; }
+    document.getElementById('cloud-restore-overlay').classList.add('active');
+    await loadCloudBackupList();
   };
 
-  window.closeGdriveRestoreModal = function(){
-    document.getElementById('gdrive-restore-overlay').classList.remove('active');
+  window.closeCloudRestoreModal = function(){
+    document.getElementById('cloud-restore-overlay').classList.remove('active');
   };
 
-  /* Called by backup-pw modal after password confirmed — mode 'gdrive-create'.
+  /* Called by backup-pw modal after password confirmed — mode 'cloud-create'.
      opts.silent suppresses toasts for backups that run automatically in the
      background, so the user isn't interrupted by something routine. */
-  window.performGdriveBackup = async function(password, opts){
+  window.performCloudBackup = async function(password, opts){
     if(decoyModeActive) return;
     opts = opts || {};
     const silent = !!opts.silent;
     try{
-      if(!silent) showToast('Saving to Google Drive…');
+      if(!silent) showToast('Backing up…');
       const saltBytes = crypto.getRandomValues(new Uint8Array(16));
       const ivBytes   = crypto.getRandomValues(new Uint8Array(12));
       const key       = await deriveKey(password, saltBytes);
@@ -5681,16 +5654,13 @@ checkForSharedMedia();
       const backupObj = {
         app:'V Vault', version:1,
         exportedAt: new Date().toISOString(),
-        userEmail: gdriveUser ? gdriveUser.email : '',
+        userEmail: authUser ? authUser.email : '',
         salt: bufToBase64(saltBytes),
         iv:   bufToBase64(ivBytes),
         ciphertext: bufToBase64(cipherBuf)
       };
       const backupJson = JSON.stringify(backupObj);
-      const dateStr  = new Date().toISOString().slice(0,10);
-      const fileName = 'vvault-backup-' + dateStr + '-' + Date.now() + '.vault';
-      const folderId = await ensureGdriveFolder();
-      await uploadToGdrive(fileName, backupJson, folderId);
+      await uploadCloudBackup(backupJson);
 
       autoBackupSettings.lastBackupTime  = Date.now();
       autoBackupSettings.lastBackupCount = photos.filter(p=>!p.deletedAt).length;
@@ -5701,64 +5671,41 @@ checkForSharedMedia();
       const banner = document.getElementById('backup-reminder-banner');
       if(banner) banner.style.display = 'none';
       if(autoBackupRetryTimer){ clearTimeout(autoBackupRetryTimer); autoBackupRetryTimer = null; }
-      if(!silent) showToast('✓ Backup saved to Google Drive!');
+      if(!silent) showToast('✓ Backup saved!');
       else notifyBackupComplete(autoBackupSettings.lastBackupCount, formatBytes(autoBackupSettings.lastBackupSize));
-      // Best-effort: keep Drive tidy by trimming to the most recent backups,
-      // same as WhatsApp only ever keeping the latest backup around.
-      cleanupOldGdriveBackups(folderId).catch(()=>{});
     }catch(err){
-      console.error('GDrive backup error', err);
-      if(err.message === 'GDRIVE_AUTH_EXPIRED'){
+      console.error('Cloud backup error', err);
+      if(err.message === 'CLOUD_AUTH_EXPIRED'){
         if(!silent) showToast('Session expired — please sign in with Google again');
+      } else if(err.message === 'CLOUD_BACKUP_TOO_LARGE'){
+        showToast('Your vault is too large for a cloud backup right now');
       } else if(silent){
         scheduleBackupRetry();
       } else {
         showToast('Backup failed — try again');
       }
     }finally{
-      const btn = document.getElementById('gdrive-backup-now-btn');
+      const btn = document.getElementById('cloud-backup-now-btn');
       if(btn){ btn.disabled = false; btn.textContent = 'Back up now'; }
     }
   };
 
-  const MAX_GDRIVE_BACKUPS = 5;
-  async function cleanupOldGdriveBackups(folderId){
-    const r = await gdriveApiFetch(
-      "https://www.googleapis.com/drive/v3/files?q='"+folderId+"'+in+parents+and+trashed%3Dfalse&orderBy=createdTime+desc&fields=files(id,createdTime)&pageSize=50",
-      {headers:{Authorization:'Bearer '+gdriveToken}}
-    );
-    const j = await r.json();
-    const files = j.files || [];
-    const stale = files.slice(MAX_GDRIVE_BACKUPS);
-    for(const f of stale){
-      try{ await deleteGdriveFile(f.id); }catch(e){ /* not fatal — next cleanup will retry */ }
-    }
-  }
-
-  async function deleteGdriveFile(fileId){
-    const r = await gdriveApiFetch('https://www.googleapis.com/drive/v3/files/'+fileId, {
-      method:'DELETE',
-      headers:{Authorization:'Bearer '+gdriveToken}
-    });
-    if(!r.ok && r.status !== 404) throw new Error('Delete failed: '+r.status);
-  }
-
-  window.gdriveDeleteBackup = async function(fileId){
+  window.cloudDeleteBackup = async function(key){
     if(!confirm('Delete this backup? This cannot be undone.')) return;
     try{
-      await deleteGdriveFile(fileId);
+      await cloudApiFetch('backup/delete', { key }, { json: true });
       showToast('Backup deleted');
-      await loadGdriveBackupList();
+      await loadCloudBackupList();
     }catch(err){
       showToast('Could not delete — try again');
     }
   };
 
-  window.gdriveRestoreFile = async function(fileId, fileName){
-    closeGdriveRestoreModal();
+  window.cloudRestoreFile = async function(key){
+    closeCloudRestoreModal();
     // Ask for password then decrypt
-    pendingGdriveRestoreId = fileId;
-    backupPwMode = 'gdrive-restore';
+    pendingCloudRestoreKey = key;
+    backupPwMode = 'cloud-restore';
     document.getElementById('backup-pw-title').textContent   = 'Enter backup password';
     document.getElementById('backup-pw-desc').textContent    = 'Enter the same password used when the backup was created.';
     document.getElementById('backup-pw-input').value         = '';
@@ -5767,16 +5714,12 @@ checkForSharedMedia();
     document.getElementById('backup-pw-overlay').classList.add('active');
   };
 
-  window.performGdriveRestore = async function(password){
+  window.performCloudRestore = async function(password){
     if(decoyModeActive) return false;
     try{
-      showToast('Fetching data from Google Drive…');
-      const resp = await gdriveApiFetch(
-        'https://www.googleapis.com/drive/v3/files/' + pendingGdriveRestoreId + '?alt=media',
-        {headers:{Authorization:'Bearer '+gdriveToken}}
-      );
-      if(!resp.ok) throw new Error('Download failed');
-      const text   = await resp.text();
+      showToast('Fetching backup…');
+      const buf   = await cloudApiFetch('backup/download', { key: pendingCloudRestoreKey }, { json: true, binary: true });
+      const text  = new TextDecoder().decode(buf);
       const parsed = JSON.parse(text);
       if(!parsed.salt||!parsed.iv||!parsed.ciphertext) throw new Error('Bad file');
       const saltBytes    = base64ToBuf(parsed.salt);
@@ -5812,11 +5755,11 @@ checkForSharedMedia();
       await persistLibrary();
       renderFolders();
       if(currentFolderId) renderFolderPhotos();
-      showToast('✓ '+count+' items restored from Google Drive!');
+      showToast('✓ '+count+' items restored!');
       return true;
     }catch(err){
-      console.error('GDrive restore error', err);
-      if(err.message === 'GDRIVE_AUTH_EXPIRED'){
+      console.error('Cloud restore error', err);
+      if(err.message === 'CLOUD_AUTH_EXPIRED'){
         showToast('Session expired — please sign in with Google again');
       } else {
         showToast('Restore failed');
@@ -5830,61 +5773,57 @@ checkForSharedMedia();
   window.openAutoBackupModal = function(){
     if(decoyModeActive) return;
     _origOpen && _origOpen();
-    if(gdriveUser){ showGdriveSignedIn(); }
-    else{ showGdriveSignedOut(); }
+    if(authUser){ showCloudSignedIn(); }
+    else{ showCloudSignedOut(); }
     refreshAutoBackupUI();
   };
 
   /* ── Internal helpers ── */
-  async function fetchGdriveUserInfo(){
+  async function fetchAuthUserInfo(){
     try{
       const r = await fetch('https://www.googleapis.com/oauth2/v3/userinfo',
-        {headers:{Authorization:'Bearer '+gdriveToken}});
+        {headers:{Authorization:'Bearer '+authToken}});
       const j = await r.json();
-      gdriveUser = {name: j.name||'', email: j.email||'', picture: j.picture||''};
-    }catch(e){ gdriveUser={name:'',email:'',picture:''}; }
+      authUser = {name: j.name||'', email: j.email||'', picture: j.picture||''};
+    }catch(e){ authUser={name:'',email:'',picture:''}; }
   }
 
-  function saveGdriveSession(expiresInSeconds){
+  function saveAuthSession(expiresInSeconds){
     try{
-      const data = { user: gdriveUser };
-      if(gdriveToken){
+      const data = { user: authUser };
+      if(authToken){
         const life = (expiresInSeconds && expiresInSeconds > 60) ? expiresInSeconds : 3500;
-        data.token     = gdriveToken;
+        data.token     = authToken;
         data.expiresAt = Date.now() + (life - 60) * 1000; // 60s safety buffer
       }
-      localStorage.setItem('vvault_gdrive', JSON.stringify(data));
+      localStorage.setItem('vvault_cloud', JSON.stringify(data));
     }catch(e){}
-    scheduleGdriveTokenRenewal();
+    scheduleAuthRenewal();
   }
 
-  /* Keeps the Drive session alive for as long as the app stays open: renews
-     the access token quietly a few minutes before it would expire, so a long
+  /* Keeps the session alive for as long as the app stays open: renews the
+     access token quietly a few minutes before it would expire, so a long
      session (or one left open overnight) never suddenly needs a fresh
      sign-in. This does NOT survive the app being fully closed for longer than
      one token lifetime — that would need Google's offline/refresh-token flow,
      which requires reconfiguring the OAuth client as a native "Android" type
      client in Google Cloud Console. */
-  function scheduleGdriveTokenRenewal(){
-    if(gdriveRenewalTimer){ clearTimeout(gdriveRenewalTimer); gdriveRenewalTimer = null; }
+  function scheduleAuthRenewal(){
+    if(authRenewalTimer){ clearTimeout(authRenewalTimer); authRenewalTimer = null; }
     try{
-      const saved = JSON.parse(localStorage.getItem('vvault_gdrive') || 'null');
+      const saved = JSON.parse(localStorage.getItem('vvault_cloud') || 'null');
       if(!saved || !saved.expiresAt) return;
       const msUntilRenew = Math.max(60000, saved.expiresAt - Date.now() - 5 * 60 * 1000); // renew 5 min early
-      gdriveRenewalTimer = setTimeout(() => {
-        if(gdriveToken) silentGdriveRefresh();
+      authRenewalTimer = setTimeout(() => {
+        if(authToken) silentAuthRefresh();
       }, msUntilRenew);
     }catch(e){}
   }
 
-  /* Tries to get a fresh access token in the background using the browser's
-     existing Google session — no popup, no re-entering the account. Used
-     both when a saved token has expired on boot, and as a first response to
-     a 401 before ever falling back to a full sign-out. */
-  /* Native (Android) path: Google's Authorization API via the VaultAuth
+  /* Native (Android) path: Google's Authorization API via the VaultMedia
      plugin. Once the user has approved once, it hands back a fresh access
      token with no screen at all — this is what makes login effectively
-     permanent, the same way WhatsApp's Drive backup works. */
+     permanent, the same way WhatsApp's backup works. */
   function nativeAuthPlugin(){
     try{
       const C = window.Capacitor;
@@ -5898,20 +5837,24 @@ checkForSharedMedia();
     return (res && res.accessToken) || null;
   }
 
-  function silentGdriveRefresh(){
+  /* Tries to get a fresh access token in the background using the browser's
+     existing Google session — no popup, no re-entering the account. Used
+     both when a saved token has expired on boot, and as a first response to
+     a 401 before ever falling back to a full sign-out. */
+  function silentAuthRefresh(){
     if(nativeAuthPlugin()){
       return nativeGetToken(false).then(token => {
         if(!token) return false;
-        gdriveToken = token;
-        saveGdriveSession(3500);
+        authToken = token;
+        saveAuthSession(3500);
         return true;
       }).catch(() => false);
     }
     // Inside the Android app, only the native plugin above is allowed to renew
     // silently. Falling back to the browser-based flow here would pop open a
     // visible sign-in page in the background every time a renewal is due —
-    // exactly the repeated "Google Drive login page" this is meant to avoid.
-    // If the native plugin isn't available, fail quietly; the next explicit
+    // exactly the repeated "login page" this is meant to avoid. If the
+    // native plugin isn't available, fail quietly; the next explicit
     // "Sign in with Google" tap will handle it properly.
     if(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()){
       return Promise.resolve(false);
@@ -5920,12 +5863,12 @@ checkForSharedMedia();
       if(typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2){ resolve(false); return; }
       try{
         const client = google.accounts.oauth2.initTokenClient({
-          client_id: GDRIVE_CLIENT_ID,
-          scope: GDRIVE_SCOPES,
+          client_id: AUTH_CLIENT_ID,
+          scope: AUTH_SCOPES,
           callback: (resp) => {
             if(resp && resp.access_token){
-              gdriveToken = resp.access_token;
-              saveGdriveSession(resp.expires_in);
+              authToken = resp.access_token;
+              saveAuthSession(resp.expires_in);
               resolve(true);
             } else {
               resolve(false);
@@ -5938,121 +5881,119 @@ checkForSharedMedia();
     });
   }
 
-  /* Wrap a Drive API fetch: on a 401, first try a silent token refresh and
-     retry once — only fall back to "sign in again" if that silent attempt
-     also fails, so a routine expired token doesn't force a full logout. */
-  async function gdriveApiFetch(url, options){
-    let r = await fetch(url, options);
-    if(r.status === 401){
-      const refreshed = await silentGdriveRefresh();
-      if(refreshed){
-        const retryOptions = Object.assign({}, options, {
-          headers: Object.assign({}, options && options.headers, { Authorization: 'Bearer ' + gdriveToken })
+  /* Calls our own Cloudflare Worker's /v1/backup/* routes, proving identity
+     with the current Google access token. On a 401 (token expired or
+     rejected) it tries one silent refresh and retries once before giving up —
+     mirrors the same "don't force a full logout for a routine expiry" idea
+     used for the account-seat heartbeat.
+     opts.json   -> send `body` as a JSON POST body
+     opts.binary -> POST raw bytes (body is an ArrayBuffer/Uint8Array), token
+                    goes in the X-Google-Token header instead of the JSON body
+     Returns parsed JSON by default, or an ArrayBuffer when opts.binary and
+     the route is a download (response content-type is octet-stream). */
+  async function cloudApiFetch(route, body, opts){
+    opts = opts || {};
+    if(!ACCOUNT_SERVER_URL){ throw new Error('CLOUD_NOT_CONFIGURED'); }
+    const url = ACCOUNT_SERVER_URL.replace(/\/$/, '') + '/v1/' + route;
+
+    async function attempt(){
+      if(route === 'backup/upload'){
+        return fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/octet-stream', 'X-Google-Token': authToken || '' },
+          body: body
         });
-        r = await fetch(url, retryOptions);
-        if(r.status !== 401) return r;
       }
-      gdriveToken    = null;
-      gdriveFolderId = null;
-      saveGdriveSession();
-      showGdriveSignedOut();
-      throw new Error('GDRIVE_AUTH_EXPIRED');
+      return fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(Object.assign({}, body, { googleToken: authToken }))
+      });
     }
-    return r;
+
+    let r = await attempt();
+    if(r.status === 401){
+      const refreshed = await silentAuthRefresh();
+      if(refreshed){ r = await attempt(); }
+      if(r.status === 401){
+        authToken = null;
+        saveAuthSession();
+        showCloudSignedOut();
+        throw new Error('CLOUD_AUTH_EXPIRED');
+      }
+    }
+    if(r.status === 413) throw new Error('CLOUD_BACKUP_TOO_LARGE');
+    if(!r.ok){
+      let msg = 'CLOUD_REQUEST_FAILED';
+      try{ const j = await r.json(); if(j && j.error) msg = j.error; }catch(e){}
+      throw new Error(msg);
+    }
+    if(route === 'backup/download'){
+      return r.arrayBuffer();
+    }
+    return r.json();
   }
 
-  function showGdriveSignedIn(){
-    const out = document.getElementById('gdrive-signed-out');
-    const inn = document.getElementById('gdrive-signed-in');
+  async function uploadCloudBackup(jsonString){
+    const bytes = new TextEncoder().encode(jsonString);
+    const j = await cloudApiFetch('backup/upload', bytes, {});
+    // Best-effort tidy-up is handled server-side (keeps only the newest few).
+    return j;
+  }
+
+  function showCloudSignedIn(){
+    const out = document.getElementById('cloud-signed-out');
+    const inn = document.getElementById('cloud-signed-in');
     if(out) out.style.display = 'none';
     if(inn) inn.style.display = 'block';
-    if(!gdriveUser) return;
-    const nameEl    = document.getElementById('gdrive-user-name');
-    const emailEl   = document.getElementById('gdrive-user-email');
-    const avatarEl  = document.getElementById('gdrive-user-avatar');
-    const initialsEl= document.getElementById('gdrive-user-initials');
-    if(nameEl)  nameEl.textContent  = gdriveUser.name  || 'Google User';
-    if(emailEl) emailEl.textContent = gdriveUser.email || '';
-    if(gdriveUser.picture && avatarEl){
-      avatarEl.src = gdriveUser.picture;
+    if(!authUser) return;
+    const nameEl    = document.getElementById('cloud-user-name');
+    const emailEl   = document.getElementById('cloud-user-email');
+    const avatarEl  = document.getElementById('cloud-user-avatar');
+    const initialsEl= document.getElementById('cloud-user-initials');
+    if(nameEl)  nameEl.textContent  = authUser.name  || 'Google User';
+    if(emailEl) emailEl.textContent = authUser.email || '';
+    if(authUser.picture && avatarEl){
+      avatarEl.src = authUser.picture;
       avatarEl.style.display = 'block';
       if(initialsEl) initialsEl.style.display = 'none';
     } else if(initialsEl){
-      initialsEl.textContent = (gdriveUser.name||'G').charAt(0).toUpperCase();
+      initialsEl.textContent = (authUser.name||'G').charAt(0).toUpperCase();
     }
   }
 
-  function showGdriveSignedOut(){
-    const out = document.getElementById('gdrive-signed-out');
-    const inn = document.getElementById('gdrive-signed-in');
+  function showCloudSignedOut(){
+    const out = document.getElementById('cloud-signed-out');
+    const inn = document.getElementById('cloud-signed-in');
     if(out) out.style.display = 'block';
     if(inn) inn.style.display = 'none';
   }
 
-  async function ensureGdriveFolder(){
-    if(gdriveFolderId) return gdriveFolderId;
-    const search = await gdriveApiFetch(
-      "https://www.googleapis.com/drive/v3/files?q=name%3D'"+encodeURIComponent(FOLDER_NAME)+"'%20and%20mimeType%3D'application%2Fvnd.google-apps.folder'%20and%20trashed%3Dfalse&fields=files(id,name)",
-      {headers:{Authorization:'Bearer '+gdriveToken}}
-    );
-    const sj = await search.json();
-    if(sj.files && sj.files.length > 0){
-      gdriveFolderId = sj.files[0].id;
-      return gdriveFolderId;
-    }
-    const create = await gdriveApiFetch('https://www.googleapis.com/drive/v3/files',{
-      method:'POST',
-      headers:{Authorization:'Bearer '+gdriveToken,'Content-Type':'application/json'},
-      body:JSON.stringify({name:FOLDER_NAME, mimeType:'application/vnd.google-apps.folder'})
-    });
-    const cj = await create.json();
-    gdriveFolderId = cj.id;
-    return gdriveFolderId;
-  }
-
-  async function uploadToGdrive(fileName, content, folderId){
-    const metadata = {name:fileName, parents:[folderId], mimeType:'application/octet-stream'};
-    const form = new FormData();
-    form.append('metadata', new Blob([JSON.stringify(metadata)],{type:'application/json'}));
-    form.append('file',     new Blob([content],{type:'application/octet-stream'}));
-    const r = await gdriveApiFetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{
-      method:'POST',
-      headers:{Authorization:'Bearer '+gdriveToken},
-      body:form
-    });
-    if(!r.ok) throw new Error('Upload failed: '+r.status);
-    return r.json();
-  }
-
-  async function loadGdriveBackupList(){
-    const listEl = document.getElementById('gdrive-restore-list');
+  async function loadCloudBackupList(){
+    const listEl = document.getElementById('cloud-restore-list');
     if(!listEl) return;
     listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">Loading…</div>';
     try{
-      const folderId = await ensureGdriveFolder();
-      const r = await gdriveApiFetch(
-        "https://www.googleapis.com/drive/v3/files?q='"+folderId+"'+in+parents+and+trashed%3Dfalse&orderBy=createdTime+desc&fields=files(id,name,createdTime,size)&pageSize=20",
-        {headers:{Authorization:'Bearer '+gdriveToken}}
-      );
-      const j = await r.json();
+      const j = await cloudApiFetch('backup/list', {}, { json: true });
       const files = j.files || [];
       if(files.length === 0){
         listEl.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;">No backups found<br><span style="font-size:11.5px;">Create a backup first</span></div>';
         return;
       }
       listEl.innerHTML = files.map(f=>{
-        const d    = new Date(f.createdTime);
+        const d    = new Date(f.uploaded);
         const date = d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
         const time = d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
-        const size = f.size ? (f.size/1024).toFixed(0)+' KB' : '';
+        const size = f.size ? formatBytes(f.size) : '';
+        const keyAttr = f.key.replace(/'/g, "\\'");
         return '<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">'
           +'<div>'
           +'<div style="font-size:13px;font-weight:500;">'+date+' · '+time+'</div>'
           +(size?'<div style="font-size:11.5px;color:var(--text-muted);">'+size+'</div>':'')
           +'</div>'
           +'<div style="display:flex;gap:6px;">'
-          +'<button onclick="gdriveRestoreFile(\''+f.id+'\',\''+f.name+'\')" style="font-size:12px;background:var(--accent-soft);color:var(--accent);border:none;border-radius:8px;padding:7px 14px;cursor:pointer;font-weight:500;">Restore</button>'
-          +'<button onclick="gdriveDeleteBackup(\''+f.id+'\')" title="Delete backup" style="font-size:12px;background:none;color:var(--text-muted);border:1px solid var(--border);border-radius:8px;padding:7px 9px;cursor:pointer;">'
+          +'<button onclick="cloudRestoreFile(\''+keyAttr+'\')" style="font-size:12px;background:var(--accent-soft);color:var(--accent);border:none;border-radius:8px;padding:7px 14px;cursor:pointer;font-weight:500;">Restore</button>'
+          +'<button onclick="cloudDeleteBackup(\''+keyAttr+'\')" title="Delete backup" style="font-size:12px;background:none;color:var(--text-muted);border:1px solid var(--border);border-radius:8px;padding:7px 9px;cursor:pointer;">'
           +'<svg width="13" height="13" viewBox="0 0 18 18" fill="none"><path d="M3.5 5h11M7 5V3.5h4V5M4.5 5l.6 9.2c.05.7.65 1.3 1.35 1.3h5.1c.7 0 1.3-.6 1.35-1.3L13.5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'
           +'</button>'
           +'</div>'
@@ -6066,43 +6007,38 @@ checkForSharedMedia();
   /* Mirrors WhatsApp's "restore from backup?" prompt right after signing in —
      only offered when this vault looks freshly set up, so we never suggest
      overwriting photos someone has already added here. */
-  async function checkForExistingBackupOnSignIn(){
+  async function checkForExistingCloudBackupOnSignIn(){
     try{
       const activeCount = photos.filter(p => !p.deletedAt).length;
       if(activeCount > 0) return;
-      const folderId = await ensureGdriveFolder();
-      const r = await gdriveApiFetch(
-        "https://www.googleapis.com/drive/v3/files?q='"+folderId+"'+in+parents+and+trashed%3Dfalse&orderBy=createdTime+desc&fields=files(id,name,createdTime)&pageSize=1",
-        {headers:{Authorization:'Bearer '+gdriveToken}}
-      );
-      const j = await r.json();
+      const j = await cloudApiFetch('backup/list', {}, { json: true });
       const files = j.files || [];
       if(files.length === 0) return;
-      const when = new Date(files[0].createdTime).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
-      if(confirm('A backup from '+when+' was found on Google Drive. Restore it now?')){
-        window.gdriveRestoreFile(files[0].id, files[0].name);
+      const when = new Date(files[0].uploaded).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+      if(confirm('A backup from '+when+' was found. Restore it now?')){
+        window.cloudRestoreFile(files[0].key);
       }
     }catch(e){ /* not critical — the Restore button is always available */ }
   }
 
-  /* ── Hook into backup-pw modal for gdrive modes ── */
-  let pendingGdriveRestoreId = null;
+  /* ── Hook into backup-pw modal for cloud modes ── */
+  let pendingCloudRestoreKey = null;
 
-  function openBackupPwModalForGdrive(){
-    backupPwMode = 'gdrive-create';
+  function openBackupPwModalForCloud(){
+    backupPwMode = 'cloud-create';
     const isPin = vault.secretType === 'pin';
     document.getElementById('backup-pw-title').textContent = isPin ? 'Confirm your PIN' : 'Confirm your password';
-    document.getElementById('backup-pw-desc').textContent  = 'Your password is needed to encrypt the Google Drive backup.';
+    document.getElementById('backup-pw-desc').textContent  = 'Your password is needed to encrypt this backup.';
     document.getElementById('backup-pw-input').value       = '';
     clearError('backuppw');
-    document.getElementById('backup-pw-confirm-btn').textContent = 'Back up to Drive';
+    document.getElementById('backup-pw-confirm-btn').textContent = 'Back up now';
     document.getElementById('backup-pw-overlay').classList.add('active');
   }
 
-  /* Patch confirmBackupPassword to handle gdrive modes */
+  /* Patch confirmBackupPassword to handle cloud modes */
   const _origConfirm = window.confirmBackupPassword;
   window.confirmBackupPassword = async function(){
-    if(backupPwMode === 'gdrive-create'){
+    if(backupPwMode === 'cloud-create'){
       const pw = document.getElementById('backup-pw-input').value;
       if(!pw){ setError('backuppw','Enter your password.'); return; }
       const btn = document.getElementById('backup-pw-confirm-btn');
@@ -6111,17 +6047,17 @@ checkForSharedMedia();
       const checkHash = await hashSecret(pw, saltCheck);
       if(checkHash !== vault.passwordHash){
         setError('backuppw','Incorrect password.');
-        btn.disabled = false; btn.textContent = 'Back up to Drive';
+        btn.disabled = false; btn.textContent = 'Back up now';
         return;
       }
       closeBackupPwModal();
-      await performGdriveBackup(pw);
-    } else if(backupPwMode === 'gdrive-restore'){
+      await performCloudBackup(pw);
+    } else if(backupPwMode === 'cloud-restore'){
       const pw = document.getElementById('backup-pw-input').value;
       if(!pw){ setError('backuppw','Enter your password.'); return; }
       const btn = document.getElementById('backup-pw-confirm-btn');
       btn.disabled = true; btn.textContent = 'Restoring…';
-      const ok = await performGdriveRestore(pw);
+      const ok = await performCloudRestore(pw);
       if(ok){ closeBackupPwModal(); }
       else { btn.disabled = false; btn.textContent = 'Restore'; }
     } else {
@@ -6132,12 +6068,13 @@ checkForSharedMedia();
   /* Register restore overlay in escape handler */
   document.addEventListener('keydown', e=>{
     if(e.key==='Escape'){
-      const ro = document.getElementById('gdrive-restore-overlay');
-      if(ro && ro.classList.contains('active')){ closeGdriveRestoreModal(); }
+      const ro = document.getElementById('cloud-restore-overlay');
+      if(ro && ro.classList.contains('active')){ closeCloudRestoreModal(); }
     }
   });
 
 })();
 </script>
+
 </body>
 </html>
