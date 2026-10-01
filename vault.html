@@ -4660,6 +4660,7 @@ function openBackupPwModalForCreate(){
   document.getElementById('backup-pw-input').value = '';
   clearError('backuppw');
   document.getElementById('backup-pw-confirm-btn').textContent = 'Create backup';
+  document.getElementById('backup-pw-confirm-btn').disabled = false;
   document.getElementById('backup-pw-overlay').classList.add('active');
 }
 
@@ -4680,6 +4681,7 @@ function handleRestoreFile(e){
       document.getElementById('backup-pw-input').value = '';
       clearError('backuppw');
       document.getElementById('backup-pw-confirm-btn').textContent = 'Restore';
+      document.getElementById('backup-pw-confirm-btn').disabled = false;
       document.getElementById('backup-pw-overlay').classList.add('active');
     }catch(err){
       showToast('That doesn\'t look like a V Vault backup file');
@@ -5612,14 +5614,18 @@ checkForSharedMedia();
   window.cloudBackupNow = async function(){
     if(decoyModeActive) return;
     if(!authToken){ showToast('Please sign in with Google first'); return; }
-    const btn = document.getElementById('cloud-backup-now-btn');
-    if(btn){ btn.disabled = true; btn.textContent = 'Backing up…'; }
     if(sessionAuthSecret){
       // vault is already unlocked this session — no need to ask for the
       // password again, same as WhatsApp never re-prompting mid-session
+      const btn = document.getElementById('cloud-backup-now-btn');
+      if(btn){ btn.disabled = true; btn.textContent = 'Backing up…'; }
       await performCloudBackup(sessionAuthSecret);
       return;
     }
+    // No cached password this session (e.g. unlocked with Face/Touch ID) —
+    // ask for it in the modal instead. Leave this button alone: the modal's
+    // own button shows progress, and canceling the modal must not leave this
+    // one stuck disabled with no way to ever back up again.
     openBackupPwModalForCloud();
   };
 
@@ -5711,6 +5717,7 @@ checkForSharedMedia();
     document.getElementById('backup-pw-input').value         = '';
     clearError('backuppw');
     document.getElementById('backup-pw-confirm-btn').textContent = 'Restore';
+    document.getElementById('backup-pw-confirm-btn').disabled = false;
     document.getElementById('backup-pw-overlay').classList.add('active');
   };
 
@@ -6032,6 +6039,7 @@ checkForSharedMedia();
     document.getElementById('backup-pw-input').value       = '';
     clearError('backuppw');
     document.getElementById('backup-pw-confirm-btn').textContent = 'Back up now';
+    document.getElementById('backup-pw-confirm-btn').disabled = false;
     document.getElementById('backup-pw-overlay').classList.add('active');
   }
 
