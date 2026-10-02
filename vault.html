@@ -297,6 +297,11 @@
     box-shadow:0 3px 10px rgba(0,0,0,0.25);
   }
   .trash-header-btn:active{transform:scale(0.95);}
+
+  .premium-badge{
+    font-size:10.5px;font-weight:600;color:#9a6b00;background:#fff3cf;
+    border-radius:20px;padding:3px 8px;margin-right:4px;white-space:nowrap;
+  }
   .google-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;color:#3c4043;border:1px solid #dadce0;font-weight:500;}
   .google-btn:active{background:#f1f3f4;}
   .google-btn:disabled{opacity:.6;}
@@ -1457,9 +1462,10 @@
       Lock Screen
     </div>
     <!-- WhatsApp-style Auto Backup row -->
-    <div class="sheet-item decoy-hide" onclick="closeSettings(); openAutoBackupModal();">
+    <div class="sheet-item decoy-hide" onclick="closeSettings(); openPremiumFeature('backup');">
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2V10M9 10L5.5 6.5M9 10L12.5 6.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 13V15.5H15V13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="14.5" cy="4.5" r="3" fill="var(--accent)"/><path d="M13.2 4.5l.9.9 1.4-1.4" stroke="white" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span style="flex:1;">Auto backup</span>
+      <span class="premium-badge" id="premium-badge-backup" style="display:none;">👑 Premium</span>
       <span id="auto-backup-status-label" style="font-size:12px;color:var(--text-muted);">Off</span>
     </div>
     <div class="sheet-item" onclick="toggleBiometric()">
@@ -1471,13 +1477,15 @@
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2.2C5.2 2.2 2.2 5 2.2 8.7c0 3.6 2.8 6.4 6.4 6.4 1.2 0 1.7-.7 1.7-1.4 0-.9-.7-1.2-.7-2 0-.8.6-1.3 1.4-1.3h1.6c1.6 0 2.8-1.1 2.8-2.7C15.4 4.6 12.6 2.2 9 2.2Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
       Advance Setting
     </div>
-    <div class="sheet-item decoy-hide" onclick="closeSettings(); openFacedownLock();">
+    <div class="sheet-item decoy-hide" onclick="closeSettings(); openPremiumFeature('facedown');">
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="5" width="12" height="9" rx="2" stroke="currentColor" stroke-width="1.4"/><circle cx="9" cy="9.5" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 5L7.3 3.5H10.7L11.5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-      Facedown Lock
+      <span style="flex:1;">Facedown Lock</span>
+      <span class="premium-badge" id="premium-badge-facedown" style="display:none;">👑 Premium</span>
     </div>
-    <div class="sheet-item decoy-hide" onclick="closeSettings(); openDecoySetup();">
+    <div class="sheet-item decoy-hide" onclick="closeSettings(); openPremiumFeature('decoy');">
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2 3.5 4.2v4.1c0 3.4 2.3 6.4 5.5 7.5 3.2-1.1 5.5-4.1 5.5-7.5V4.2L9 2Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M9 9a1.6 1.6 0 1 0 0-3.2A1.6 1.6 0 0 0 9 9Zm0 0v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
       <span style="flex:1;">Decoy vault</span>
+      <span class="premium-badge" id="premium-badge-decoy" style="display:none;">👑 Premium</span>
       <span style="font-size:12px;color:var(--text-muted);" id="decoy-status-label">Off</span>
     </div>
     <div class="sheet-item" onclick="openStorageStats()">
@@ -1530,6 +1538,27 @@
       <div class="modal-actions" style="flex-direction:column;gap:8px;">
         <button class="btn btn-primary" style="width:100%;" onclick="seatRespond(true)">Approve</button>
         <button class="btn btn-ghost" style="width:100%;color:var(--danger);" onclick="seatRespond(false)">Deny</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Premium upgrade prompt -->
+  <div class="modal-overlay" id="premium-upgrade-overlay">
+    <div class="modal-card" style="text-align:left;">
+      <h3 style="display:flex;align-items:center;gap:8px;">👑 Premium feature</h3>
+      <p id="premium-upgrade-text" style="font-size:13.5px;color:var(--text-muted);line-height:1.55;margin:0 0 10px;">This feature is part of V Vault Premium.</p>
+      <div style="padding:12px 14px;background:var(--bg-elevated);border-radius:10px;margin-bottom:10px;">
+        <div style="font-size:11.5px;color:var(--text-muted);font-weight:600;margin-bottom:8px;letter-spacing:.5px;">PREMIUM INCLUDES</div>
+        <div style="font-size:13px;line-height:1.9;">
+          ☁️ Cloud Backup (auto backup &amp; restore)<br>
+          🫥 Decoy vault<br>
+          🤳 Facedown Lock (Intruder Selfie)
+        </div>
+      </div>
+      <p id="premium-upgrade-signin-hint" style="font-size:12px;color:var(--text-muted);display:none;margin:0 0 10px;">Sign in with Google first so Premium can be tied to your account.</p>
+      <div class="modal-actions" style="flex-direction:column;gap:8px;">
+        <button class="btn btn-primary" style="width:100%;" onclick="requestPremiumUpgrade()">Upgrade to Premium</button>
+        <button class="btn btn-ghost" style="width:100%;" onclick="closePremiumUpgrade()">Not now</button>
       </div>
     </div>
   </div>
@@ -1907,6 +1936,72 @@ let autoBackupRetryTimer = null;
    scheduled backups can run silently (no re-prompt) while the vault is unlocked.
    Never persisted, and cleared the moment the vault locks. */
 let sessionAuthSecret = null;
+
+/* ===== PREMIUM STATUS =====
+   Tied to the signed-in Google account (same identity used for Cloud Backup
+   and the account seat). Checked against the server whenever possible, but
+   cached locally so a brief offline moment doesn't lock a paying user out. */
+let premiumActive = false;
+function loadPremiumCache(){
+  try{
+    const c = JSON.parse(localStorage.getItem('vvault_premium') || 'null');
+    premiumActive = !!(c && c.active);
+  }catch(e){}
+}
+function savePremiumCache(){
+  try{ localStorage.setItem('vvault_premium', JSON.stringify({ active: premiumActive, checkedAt: Date.now() })); }catch(e){}
+}
+loadPremiumCache();
+
+async function checkPremiumStatus(){
+  if(!ACCOUNT_SERVER_URL) return;
+  const token = window.cloudGetToken && window.cloudGetToken();
+  if(!token) return;
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), 8000);
+  try{
+    const r = await fetch(ACCOUNT_SERVER_URL.replace(/\/$/, '') + '/v1/premium/status', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ googleToken: token }), signal: ctl.signal
+    });
+    if(r.ok){
+      const j = await r.json();
+      premiumActive = !!j.premium;
+      savePremiumCache();
+      refreshPremiumBadges();
+    }
+  }catch(e){ /* offline or server unreachable — keep the last known cached value */ }
+  finally{ clearTimeout(timer); }
+}
+
+function refreshPremiumBadges(){
+  ['backup','facedown','decoy'].forEach(key => {
+    const el = document.getElementById('premium-badge-' + key);
+    if(el) el.style.display = premiumActive ? 'none' : 'inline-block';
+  });
+}
+
+const PREMIUM_FEATURE_NAMES   = { backup: 'Cloud Backup', facedown: 'Facedown Lock', decoy: 'Decoy vault' };
+const PREMIUM_FEATURE_OPENERS = { backup: () => openAutoBackupModal(), facedown: () => openFacedownLock(), decoy: () => openDecoySetup() };
+
+function openPremiumFeature(key){
+  if(premiumActive){ PREMIUM_FEATURE_OPENERS[key](); return; }
+  const token = window.cloudGetToken && window.cloudGetToken();
+  document.getElementById('premium-upgrade-text').textContent = PREMIUM_FEATURE_NAMES[key] + ' is part of V Vault Premium.';
+  document.getElementById('premium-upgrade-signin-hint').style.display = token ? 'none' : 'block';
+  document.getElementById('premium-upgrade-overlay').classList.add('active');
+}
+function closePremiumUpgrade(){
+  document.getElementById('premium-upgrade-overlay').classList.remove('active');
+}
+function requestPremiumUpgrade(){
+  // Payment isn't wired up yet — this opens a support email so the developer
+  // can confirm payment by hand and flip the account to Premium meanwhile.
+  const email = (vault.gmailEmail || '').trim();
+  const subject = encodeURIComponent('V Vault Premium upgrade request');
+  const body = encodeURIComponent('Hi,\n\nI would like to upgrade to V Vault Premium.\nMy account email: ' + (email || '(please fill in)') + '\n\nThanks!');
+  window.open('mailto:support@vvault.app?subject=' + subject + '&body=' + body, '_blank');
+}
 
 const questionText = {
   pet: "What was the name of your first pet?",
@@ -3216,6 +3311,7 @@ function enterVault(){
   renderFolders();
   // WhatsApp-style: check if auto-backup is overdue on every vault open
   setTimeout(checkAutoBackupDue, 1200);
+  setTimeout(checkPremiumStatus, 1500);
   if(pendingSharedMedia.length > 0){
     const toAdd = pendingSharedMedia;
     pendingSharedMedia = [];
@@ -4558,6 +4654,7 @@ function openSettings(){
   if(intruderToggle) intruderToggle.classList.toggle('on', intruderSelfieEnabled);
   const decoyLabel = document.getElementById('decoy-status-label');
   if(decoyLabel) decoyLabel.textContent = vault.decoyEnabled ? 'On' : 'Off';
+  refreshPremiumBadges();
   document.getElementById('sheet-overlay').classList.add('active');
   document.getElementById('settings-sheet').classList.add('open');
 }
@@ -5495,6 +5592,7 @@ checkForSharedMedia();
   let authLoginCallback = null;
   function onAuthSignedInSuccess(){
     showCloudSignedIn();
+    checkPremiumStatus();
     if(authLoginCallback){
       const cb = authLoginCallback;
       authLoginCallback = null;
@@ -5607,6 +5705,11 @@ checkForSharedMedia();
     autoBackupSettings.enabled = false;
     saveAutoBackupSettings();
     localStorage.removeItem('vvault_cloud');
+    // Clear premium too — otherwise a stale "premium" cache from this account
+    // could briefly leak into a different Google account signing in next.
+    premiumActive = false;
+    try{ localStorage.removeItem('vvault_premium'); }catch(e){}
+    refreshPremiumBadges();
     showCloudSignedOut();
     if(quiet !== true) showToast('Signed out');
   };
